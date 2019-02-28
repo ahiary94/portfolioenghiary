@@ -21,7 +21,6 @@ import org.json.JSONObject;
 
 public class signUpAct extends AppCompatActivity implements SignupView, View.OnClickListener {
 
-    public static int userId = 0;
     private EditText suser;
     private EditText spass;
     private EditText scon;
@@ -61,6 +60,16 @@ public class signUpAct extends AppCompatActivity implements SignupView, View.OnC
     }
 
     @Override
+    public String getUsername() {
+        return model.getUsername();
+    }
+
+    @Override
+    public String getUserPassword() {
+        return model.getPassword();
+    }
+
+    @Override
     public void onResponse(JSONObject response) {
         if (response.equals("0"))
             // "0" mean that the uaser acyually exist and there is a data
@@ -73,8 +82,6 @@ public class signUpAct extends AppCompatActivity implements SignupView, View.OnC
             } else {
                 // save the username to use it in other activities
                 users_account.usersAccount = suser.getText().toString();
-                userId++;
-                users_account.uId = userId;
                 spass.setError(null);
                 // users_account.uId= response.getBytes;
                 Intent i = new Intent(signUpAct.this, MainActivity.class);
@@ -82,23 +89,6 @@ public class signUpAct extends AppCompatActivity implements SignupView, View.OnC
             }
         }
     }
-
-    @Override
-    public void onFailer(VolleyError error) {
-        Toast.makeText(this, "There is error ...", Toast.LENGTH_SHORT).show();
-        Log.e("SIGNUP error is", "" + error);
-    }
-
-    @Override
-    public String getUsername() {
-        return model.getUsername();
-    }
-
-    @Override
-    public String getUserPassword() {
-        return model.getPassword();
-    }
-
 
     @Override
     public void onClick(View v) {
@@ -115,5 +105,11 @@ public class signUpAct extends AppCompatActivity implements SignupView, View.OnC
                 Toast.makeText(this, "Please fill empty fields", Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    @Override
+    public void onFailer(VolleyError error) {
+        Toast.makeText(this, "There is error ...", Toast.LENGTH_SHORT).show();
+        Log.e("SIGNUP error is", "" + error);
     }
 }

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/color_list_relativeLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/color_list_pink"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="@color/pink" />
+
+    <TextView
+        android:id="@+id/color_list_yellow"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_toRightOf="@id/color_list_pink"
+        android:background="@color/yellow" />
+
+    <TextView
+        android:id="@+id/color_list_blue"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_toRightOf="@id/color_list_yellow"
+        android:background="@color/blue" />
+
+    <TextView
+        android:id="@+id/color_list_white"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_below="@id/color_list_pink"
+        android:background="@color/white" />
+
+    <TextView
+        android:id="@+id/color_list_green"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_below="@id/color_list_yellow"
+        android:layout_toRightOf="@id/color_list_white"
+        android:background="@color/green" />
+
+    <TextView
+        android:id="@+id/color_list_purple"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_below="@id/color_list_blue"
+        android:layout_toRightOf="@id/color_list_green"
+        android:background="@color/purple" />
+
+    <TextView
+        android:id="@+id/color_list_default"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_below="@id/color_list_white"
+        android:background="@drawable/rosewallpaper" />
+
+    <TextView
+        android:id="@+id/color_list_greenWallpaper"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_below="@id/color_list_green"
+        android:layout_toRightOf="@id/color_list_default"
+        android:background="@drawable/green_wallpaper" />
+
+    <TextView
+        android:id="@+id/color_list_brown"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_below="@id/color_list_purple"
+        android:layout_toRightOf="@id/color_list_greenWallpaper"
+        android:background="@drawable/brown_wallpaper" />
+
+</RelativeLayout>

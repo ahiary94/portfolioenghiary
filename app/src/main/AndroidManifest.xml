@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.abeer.mysecretportfolio">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -10,17 +10,26 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".addnote.AddNoteActivity" android:label=""></activity>
+        <activity android:name=".MainActivity" android:label="@string/portfolio">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-        <activity android:name=".MainActivity" android:label="Text" ></activity>
-
-        <activity android:name=".listAct" android:label="List" />
-        <activity android:name=".passwordAct" android:label="Login"></activity>
-        <activity android:name=".signup.signUpAct" android:label="Register" ><intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter></activity>
-        <activity android:name=".SplashAct" android:label="My notes"></activity>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".listAct"
+            android:label="List" />
+        <activity
+            android:name=".passwordAct"
+            android:label="Login" />
+        <activity
+            android:name=".signup.signUpAct"
+            android:label="Register" />
+        <activity
+            android:name=".SplashAct"
+            android:label="My notes" />
     </application>
 
 </manifest>

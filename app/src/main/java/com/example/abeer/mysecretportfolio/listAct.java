@@ -45,7 +45,7 @@ public class listAct extends AppCompatActivity {
         if (item.getItemId()==R.id.plugins_exit)//3
         {
             AlertDialog.Builder alertB=new AlertDialog.Builder(this)
-                    .setIcon(R.drawable.exit)
+                    .setIcon(R.drawable.ic_exit_to_app_black_24dp)
                     .setTitle("My Portfolio")
                     .setMessage("Are you want exit ?");
 
@@ -76,10 +76,7 @@ public class listAct extends AppCompatActivity {
 
         }
 
-        if (item.getItemId()==R.id.plugins_edit)//5
-        {
 
-        }
 
 
 

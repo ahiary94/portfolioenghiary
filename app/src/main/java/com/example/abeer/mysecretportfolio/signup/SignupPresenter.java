@@ -13,7 +13,7 @@ import org.json.JSONObject;
 
 public class SignupPresenter implements Response.Listener<JSONObject>, Response.ErrorListener {
 
-    private String signupUrl = String.format("%s%s", BuildConfig.URL, "newEmptyPHP.php");
+    private String signupUrl = String.format("%s%s", BuildConfig.URL, "SignUp.php");//192.168.1.12
     private RequestQueue rq;
     private JsonObjectRequest jsonObjectRequest;
     private SignupView signupView;

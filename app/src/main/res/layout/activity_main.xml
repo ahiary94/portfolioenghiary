@@ -1,35 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/rosewallpaper"
-    tools:context="com.example.abeer.mysecretportfolio.MainActivity"
-   >
+    android:fitsSystemWindows="true"
+    tools:context="com.example.abeer.mysecretportfolio.MainActivity">
 
-    <LinearLayout
-        android:id="@+id/tex_container"
+    <include
+        android:id="@+id/main_include_toolbar"
+        layout="@layout/action_bar_layout" />
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/main_drawer_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        >
-        <EditText
-            android:layout_width="match_parent"
+        android:background="@drawable/rosewallpaper"
+        android:layout_below="@id/main_include_toolbar">
+
+        <android.support.design.widget.NavigationView
+            android:id="@+id/main_navigation_view"
+            android:layout_width="200dp"
             android:layout_height="match_parent"
-            android:id="@+id/main_et"
-            android:ems="10"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:text="My Notes simplify your life , it is an easy tool to recored your notes in any time and in any place ."
-            android:fontFamily="casual"
-            android:textColor="#000"
-            android:padding="@dimen/activity_vertical_margin"
-            android:layout_margin="@dimen/activity_vertical_margin"
-            />
+            android:layout_gravity="start"
+            android:fitsSystemWindows="true"
+            app:menu="@menu/pluginsmenu" />
 
-    </LinearLayout>
+    </android.support.v4.widget.DrawerLayout>
 
-</ScrollView>
+</RelativeLayout>
