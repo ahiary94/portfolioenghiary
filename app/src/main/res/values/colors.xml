@@ -4,7 +4,7 @@
     <color name="colorPrimaryDark">#784950</color>
     <color name="colorAccent">#784950</color>//ffbd90
 
-    <color name="lightPink">#F7E3E8</color>
+    <color name="lightPink">#FAF2F2</color>
 
     <color name="yellow">#FFECA8</color>
     <color name="pink">#F7C4D2</color>
@@ -12,6 +12,12 @@
     <color name="blue">#73DAF1</color>
     <color name="white">#FFFFFF</color>
     <color name="green">#A8DA98</color>
+    <color name="orange">#F79A7B</color>
+    <color name="red">#F18E8E</color>
+    <color name="greenTwo">#0EF8E6</color>
+    <color name="orangeTwo">#D57F34</color>
+
+    <color name="colorList">#B8B6B6</color>
 
     <!--    <color name="colorPrimary">#fde9cdae</color>-->
 

@@ -1,4 +1,4 @@
-package com.example.abeer.mysecretportfolio.signup;
+package com.example.abeer.mysecretportfolio.models;
 
 public class SignupModel {
 

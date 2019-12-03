@@ -7,7 +7,7 @@ import android.os.Bundle;
 
 public class SplashAct extends AppCompatActivity implements Runnable{
 
-    private  static  int splashTimeOut = 3000;
+    private  static  int splashTimeOut = 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -10,20 +10,27 @@
 
     <include
         android:id="@+id/main_include_toolbar"
-        layout="@layout/action_bar_layout" />
+        layout="@layout/main_toolbar" />
 
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/main_drawer_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/rosewallpaper"
         android:layout_below="@id/main_include_toolbar">
+
+        <RelativeLayout
+            android:id="@+id/main_relativeLayout_container"
+            android:background="@color/lightPink"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
         <android.support.design.widget.NavigationView
             android:id="@+id/main_navigation_view"
             android:layout_width="200dp"
             android:layout_height="match_parent"
             android:layout_gravity="start"
+            app:headerLayout="@layout/header_drawer_layout"
+            android:clickable="true"
             android:fitsSystemWindows="true"
             app:menu="@menu/pluginsmenu" />
 

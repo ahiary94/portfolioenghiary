@@ -3,8 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:title="@string/voice_message"
+        android:id="@+id/add_note_voice_message"
+        app:showAsAction="always"
+        android:icon="@drawable/microphone"/>
+
+    <item
         android:title="@string/add"
         android:id="@+id/add_note_btn"
         app:showAsAction="always"
         android:icon="@drawable/ic_note_add_black_24dp"/>
+
 </menu>

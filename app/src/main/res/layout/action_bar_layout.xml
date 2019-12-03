@@ -5,15 +5,20 @@
     android:layout_height="wrap_content">
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/general_toolbar"
+        android:id="@+id/add_note_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:ignore="NewApi">
 
-        <TextView
-            android:id="@+id/toolbar_textView"
-            android:layout_width="wrap_content"
+        <EditText
+            android:id="@+id/add_note_toolbar_editText"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:hint="Title..."
+            android:textColorHint="@color/pink"
+            android:textColor="@color/white"
+            android:maxLength="22"
+            android:fontFamily="casual"
             android:padding="5dp"/>
 
     </android.support.v7.widget.Toolbar>

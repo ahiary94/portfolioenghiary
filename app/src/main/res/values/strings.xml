@@ -10,10 +10,21 @@
     <string name="close">Close</string>
 
     <string name="background">Background</string>
-    <string name="exit">Exit</string>
     <string name="edit">Edit</string>
     <string name="save">Save</string>
-    <string name="delete">Delete</string>
     <string name="add">Add</string>
+    <string name="voice_message">Voice Message</string>
+
+    <string name="calender">Calender</string>
+    <string name="positive">Positive Quotes</string>
+    <string name="favourite_list">Favourite List</string>
+    <string name="delete_all">Delete All</string>
+    <string name="exit">Exit</string>
+
+    <string name="favourite">Add to favourite</string>
+    <string name="lock">Lock to taskbar</string>
+    <string name="secret">Secret</string>
+    <string name="delete">Delete</string>
+
 
 </resources>

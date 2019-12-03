@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.abeer.mysecretportfolio">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -9,18 +10,36 @@
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".addnote.AddNoteActivity" android:label=""></activity>
-        <activity android:name=".MainActivity" android:label="@string/portfolio">
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
+        <activity
+            android:name=".plugins.favourite.FavouriteActivity"
+            android:label="@string/favourite_list"></activity>
+        <activity
+            android:name=".plugins.positivequotes.PositiveQuotesActivity"
+            android:label="@string/positive" />
+
+        <activity
+            android:name=".TestingActivity"
+            android:label="Testing">
+
+        </activity>
+
+        <activity
+            android:name=".plugins.CalenderActivity"
+            android:label="@string/calender" />
+        <activity
+            android:name=".addnote.AddNoteActivity"
+            android:label="" />
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/portfolio">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".listAct"
-            android:label="List" />
         <activity
             android:name=".passwordAct"
             android:label="Login" />
@@ -29,7 +48,10 @@
             android:label="Register" />
         <activity
             android:name=".SplashAct"
-            android:label="My notes" />
+            android:label="My notes"
+            android:noHistory="false" >
+
+        </activity>
     </application>
 
 </manifest>

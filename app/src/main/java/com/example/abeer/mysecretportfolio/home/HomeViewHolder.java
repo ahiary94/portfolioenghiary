@@ -9,10 +9,12 @@ import com.example.abeer.mysecretportfolio.R;
 public class HomeViewHolder extends RecyclerView.ViewHolder {
 
      TextView textView;
+     TextView title;
 
     public HomeViewHolder(View itemView) {
         super(itemView);
 
         textView = itemView.findViewById(R.id.home_add_new_note);
+        title = itemView.findViewById(R.id.textView_favorite_title);
     }
 }

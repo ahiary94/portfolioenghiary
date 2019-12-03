@@ -1,183 +1,323 @@
 package com.example.abeer.mysecretportfolio.addnote;
 
+import android.app.Activity;
+import android.app.NotificationManager;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.abeer.mysecretportfolio.AddNoteDatabase;
+import com.example.abeer.mysecretportfolio.MainActivity;
 import com.example.abeer.mysecretportfolio.R;
+import com.example.abeer.mysecretportfolio.models.HomeModel;
+import com.example.abeer.mysecretportfolio.models.AddNoteModel;
 
-public class AddNoteActivity extends AppCompatActivity implements AddNoteView, DialogInterface.OnClickListener, View.OnClickListener {
-    private EditText writeNote;
+import de.hdodenhof.circleimageview.CircleImageView;
+
+public class AddNoteActivity extends AppCompatActivity implements AddNoteView, View.OnClickListener, DialogInterface.OnClickListener {
     private Toolbar toolbar;
-    private TextView pinkTextView;
-    private TextView yellowTextView;
-    private TextView blueTextView;
-    private TextView whiteTextView;
-    private TextView greenTextView;
-    private TextView purpleTextView;
-    private TextView defaultTextView;
-    private TextView greenWallpaperTextView;
-    private TextView brownTextView;
-    private RelativeLayout relativeLayout;
+    private Activity activity;
+    private EditText writeNote;
+    private EditText titleEditText;
+    private CircleImageView pinkTextView;
+    private CircleImageView yellowTextView;
+    private CircleImageView blueTextView;
+    private CircleImageView whiteTextView;
+    private CircleImageView greenTextView;
+    private CircleImageView purpleTextView;
+    private CircleImageView orangeTextView;
+    private CircleImageView defaultTextView;
+    private CircleImageView greenWallpaperTextView;
+    private CircleImageView brownTextView;
+    private CircleImageView randomTextView;
+    private AddNoteDatabase addNoteDatabase;
+    private AddNoteModel model;
+    private int id = 0;
+    private NotificationManager mNotificationManager;
+    private threadClassPart threadClassPart;
+    private final int idSave = 1;
+    private final int idDelete = 2;
+    private final int idFavorite = 3;
+    private final int idLock = 4;
+    private MenuItem itemFavorite;
+    private MenuItem itemLock;
+    private MenuItem itemSave;
+    private MenuItem itemDelete;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_note);
+        activity = this;
 
-        toolbar = findViewById(R.id.general_toolbar);
+        toolbar = findViewById(R.id.add_note_toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        addNoteDatabase = new AddNoteDatabase(this);
+        model = new AddNoteModel(0, 0, 0);
+        model.setTitle("No Title");
+        model.setNote("Empty...");
+        model.setColor("" + R.drawable.rosewallpaper);
 
         writeNote = findViewById(R.id.add_note_editText);
-        relativeLayout = findViewById(R.id.color_list_relativeLayout);
+        titleEditText = findViewById(R.id.add_note_toolbar_editText);
+        pinkTextView = findViewById(R.id.color_list_pink);
+        yellowTextView = findViewById(R.id.color_list_yellow);
+        blueTextView = findViewById(R.id.color_list_blue);
+        whiteTextView = findViewById(R.id.color_list_white);
+        greenTextView = findViewById(R.id.color_list_green);
+        purpleTextView = findViewById(R.id.color_list_purple);
+        orangeTextView = findViewById(R.id.color_list_orange);
+        defaultTextView = findViewById(R.id.color_list_default);
+        greenWallpaperTextView = findViewById(R.id.color_list_greenWallpaper);
+        brownTextView = findViewById(R.id.color_list_brown);
+        randomTextView = findViewById(R.id.color_list_random);
 
-//        pinkTextView = findViewById(R.id.color_list_pink);
-//        yellowTextView = findViewById(R.id.color_list_yellow);
-//        blueTextView = findViewById(R.id.color_list_blue);
-//        whiteTextView = findViewById(R.id.color_list_white);
-//        greenTextView = findViewById(R.id.color_list_green);
-//        purpleTextView = findViewById(R.id.color_list_purple);
-//        defaultTextView = findViewById(R.id.color_list_default);
-//        greenWallpaperTextView = findViewById(R.id.color_list_greenWallpaper);
-//        brownTextView = findViewById(R.id.color_list_brown);
-
-//        ActionBar actionBar = getSupportActionBar();
-//        actionBar.setDisplayHomeAsUpEnabled(true);
-//        greenTextView.setOnClickListener(this);
-//        brownTextView.setOnClickListener(this);
-
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.noteoptions, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.note_option_background: {
-                getBackgroundColor();
-                break;
-            }
-            case R.id.note_option_delete: {
-                break;
-            }
-            case R.id.note_option_save: {
-                break;
-            }
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void getBackgroundColor() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        RelativeLayout layout = new RelativeLayout(this);
-        pinkTextView = new TextView(this);
-        yellowTextView = new TextView(this);
-        blueTextView = new TextView(this);
-        brownTextView = new TextView(this);
-        whiteTextView = new TextView(this);
-        purpleTextView = new TextView(this);
-        defaultTextView = new TextView(this);
-        greenTextView = new TextView(this);
-        greenWallpaperTextView = new TextView(this);
-
-        pinkTextView.setHeight(150);
-        pinkTextView.setWidth(150);
-        pinkTextView.setBackgroundResource(R.color.pink);
-        yellowTextView.setBackgroundResource(R.color.yellow);
-        blueTextView.setBackgroundResource(R.color.blue);
-        brownTextView.setBackgroundResource(R.drawable.brown_wallpaper);
-        whiteTextView.setBackgroundResource(R.color.white);
-        purpleTextView.setBackgroundResource(R.color.purple);
-        defaultTextView.setBackgroundResource(R.drawable.rosewallpaper);
-        greenTextView.setBackgroundResource(R.color.green);
-        greenWallpaperTextView.setBackgroundResource(R.drawable.green_wallpaper);
-
-        RelativeLayout.LayoutParams paramsYellow = new RelativeLayout.LayoutParams(150,150);
-        paramsYellow.leftMargin = 150;
-
-        RelativeLayout.LayoutParams paramsBlue = new RelativeLayout.LayoutParams(150,150);
-        paramsBlue.leftMargin = 300;
-
-        RelativeLayout.LayoutParams paramsPurple = new RelativeLayout.LayoutParams(150,150);
-        paramsPurple.topMargin = 150;
-
-
-        RelativeLayout.LayoutParams paramsWhite = new RelativeLayout.LayoutParams(150,150);
-        paramsWhite.leftMargin = 150;
-        paramsWhite.topMargin = 150;
-
-        RelativeLayout.LayoutParams paramsGreen = new RelativeLayout.LayoutParams(150,150);
-        paramsGreen.leftMargin = 300;
-        paramsGreen.topMargin = 150;
-
-        RelativeLayout.LayoutParams paramsGreenWallpaper = new RelativeLayout.LayoutParams(150,150);
-        paramsGreenWallpaper.topMargin = 300;
-
-        RelativeLayout.LayoutParams paramsBrownWallpaper = new RelativeLayout.LayoutParams(150,150);
-        paramsBrownWallpaper.leftMargin = 150;
-        paramsBrownWallpaper.topMargin = 300;
-
-        RelativeLayout.LayoutParams paramsDefaultWallpaper = new RelativeLayout.LayoutParams(150,150);
-        paramsDefaultWallpaper.leftMargin = 300;
-        paramsDefaultWallpaper.topMargin = 300;
-
-        layout.addView(pinkTextView);
-        layout.addView(yellowTextView,paramsYellow);
-        layout.addView(blueTextView,paramsBlue);
-        layout.addView(purpleTextView,paramsPurple);
-        layout.addView(whiteTextView,paramsWhite);
-        layout.addView(greenTextView,paramsGreen);
-        layout.addView(greenWallpaperTextView,paramsGreenWallpaper);
-        layout.addView(brownTextView,paramsBrownWallpaper);
-        layout.addView(defaultTextView,paramsDefaultWallpaper);
-
-//        LayoutInflater factory = LayoutInflater.from(this);
-//        View view = factory.inflate(R.layout.activity_colors_list, null);
-//        builder.setView(view);
-        builder.setView(layout);
-//        builder.setPositiveButton("Ok", this);
-
-//        AlertDialog dialog = builder.create();
-//        dialog.getWindow().setLayout(561, 700);
-        builder.show();
-
-    }
-
-    @Override
-    public void deleteTheNote() {
-
-    }
-
-    @Override
-    public void onClick(DialogInterface dialog, int which) {
-        Log.e("which", "" + which);
         pinkTextView.setOnClickListener(this);
         blueTextView.setOnClickListener(this);
         purpleTextView.setOnClickListener(this);
         whiteTextView.setOnClickListener(this);
         yellowTextView.setOnClickListener(this);
         greenTextView.setOnClickListener(this);
+        orangeTextView.setOnClickListener(this);
         defaultTextView.setOnClickListener(this);
         greenWallpaperTextView.setOnClickListener(this);
         brownTextView.setOnClickListener(this);
+        randomTextView.setOnClickListener(this);
+//        addNoteDatabase.clearDatabase();
+//        if (AddNoteModel.bit == 1) {
+//            receiveIntentInformation();
+//        }
+    }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        itemSave = menu.add(Menu.NONE, idSave, 1, "Save");
+        itemDelete = menu.add(Menu.NONE, idDelete, 2, "Delete");
+        itemFavorite = menu.add(Menu.NONE, idFavorite, 3, "Favorite");
+        itemLock = menu.add(Menu.NONE, idLock, 4, "Lock");
+
+        itemSave.setIcon(R.drawable.ic_save_black_24dp);
+        itemDelete.setIcon(R.drawable.ic_delete_black_24dp);
+        itemSave.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        itemDelete.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        itemFavorite.setCheckable(true);
+        itemLock.setCheckable(true);
+
+        if (AddNoteModel.bit == 1) {
+            receiveIntentInformation();
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            case 1:
+                if (writeNote.getText().length() != 0 || titleEditText.getText().length() != 0)
+                    saveNote();
+                else
+                    Toast.makeText(this, "The note is empty!", Toast.LENGTH_SHORT).show();
+                break;
+            case 2:
+                if (AddNoteModel.bit == 1) {
+                    deleteTheNote();
+                } else {
+                    Toast.makeText(this, "The note doesn't saved yet!", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case 3:
+                itemFavorite.setCheckable(true);
+                if (model.getFavourite() == 0) {
+                    model.setFavourite(1);
+                    itemFavorite.setChecked(true);
+                } else {
+                    model.setFavourite(0);
+                    itemFavorite.setChecked(false);
+                }
+                break;
+            case 4:
+                itemLock.setCheckable(true);
+                if (model.getLock() == 0) {
+                    model.setLock(1);
+                    itemLock.setChecked(true);
+//                    Log.e("locked", "" + model.getLock());
+                } else {
+                    model.setLock(0);
+                    itemLock.setChecked(false);
+//                    Log.e("locked", "" + model.getLock());
+                }
+                break;
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void doFavoriteAction() {
+
+    }
+
+    @Override
+    public void doLockAction() {
+
+    }
+
+    @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
+        AddNoteModel.bit = 0;
+        Intent homeIntent = new Intent(AddNoteActivity.this, MainActivity.class);
+        startActivity(homeIntent);
+        finish();
+    }
+
+    @Override
+    public void lockNoteToNotificationBar() {
+//        mNotificationManager = (NotificationManager)
+//                getSystemService(Context.NOTIFICATION_SERVICE);
+//
+//        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+//                i, PendingIntent.FLAG_ONE_SHOT);
+//
+//        NotificationCompat.Builder mBuilder =
+//                new NotificationCompat.Builder(this)
+//                        .setSmallIcon(R.drawable.ic_launcher)
+//                        .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher))
+//                        .setContentTitle(title)
+//                        .setDefaults(Notification.DEFAULT_SOUND)
+//                        .setStyle(new NotificationCompat.BigTextStyle()
+//                                .bigText(msg))
+//                        .setContentText(msg)
+//                        .setPriority(Notification.PRIORITY_MAX);
+//
+//        mBuilder.setContentIntent(contentIntent);
+//        mNotificationManager.notify((int) value, mBuilder.build());
+    }
+
+    @Override
+    public void saveNote() {
+        model.setNote("" + writeNote.getText());
+        model.setTitle("" + titleEditText.getText());
+        if (AddNoteModel.bit == 0) {
+//            Log.e("after adding to db", "" + model.getId());
+            addNoteDatabase.addContent(model.getTitle(), model.getNote(), model.getColor());
+//            Log.e("...........", "savePluginsInformation");
+            threadClassPart = new threadClassPart();////////////////
+            threadClassPart.start();///////////////
+            Toast.makeText(this, "The Note Saved", Toast.LENGTH_SHORT).show();
+        } else if (AddNoteModel.bit == 1) {
+            addNoteDatabase.updateContent(id, model.getTitle(), model.getNote(), model.getColor());
+            Log.e("fav after edit", "" + model.getFavourite());
+            Log.e("lock after edit", "" + model.getLock());
+            addNoteDatabase.updatePlugins(model.getPluginsID(), model.getFavourite(), model.getLock());
+        }
+        AddNoteModel.bit = 0;
+        Intent goToHome = new Intent(AddNoteActivity.this, MainActivity.class);
+        startActivity(goToHome);
+        finish();
+    }
+
+    public class threadClassPart extends Thread {
+        public void run() {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                    Cursor cursor = addNoteDatabase.selectTheLastRow();
+                    cursor.moveToFirst();
+                    int noteID = cursor.getInt(0);
+                    Log.e("returned id", "" + noteID);
+                    cursor.close();
+                    addNoteDatabase.addPluginsContent(noteID, model.getFavourite(), model.getLock());
+                    Cursor cursor1 = addNoteDatabase.selectPluginsContent();
+                    if (cursor1.moveToFirst()) {
+                        do {
+                            int column1 = cursor1.getInt(0);
+                            Log.e("id", "" + column1);
+                            int column2 = cursor1.getInt(1);
+                            Log.e("fav", "" + column2);
+                            int column3 = cursor1.getInt(2);
+                            Log.e("lock", "" + column3);
+
+                        } while (cursor1.moveToNext());
+                    }
+                    cursor1.close();
+                }
+            });
+        }
+    }
+
+    @Override
+    public void deleteTheNote() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Are You Want Delete it?");
+        builder.setIcon(R.drawable.ic_delete_black_24dp);
+        builder.setPositiveButton("Ok", this);
+        builder.setNeutralButton("Cancel", this);
+        builder.show();
+
+    }
+
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+        switch (which) {
+            case DialogInterface.BUTTON_POSITIVE: {
+                Toast.makeText(this, "The note is deleted", Toast.LENGTH_SHORT).show();
+                addNoteDatabase.clearNote(id);
+                AddNoteModel.bit = 0;
+                Intent goToHome = new Intent(AddNoteActivity.this, MainActivity.class);
+                startActivity(goToHome);
+                finish();
+                break;
+            }
+            case DialogInterface.BUTTON_NEUTRAL: {
+                dialog.cancel();
+            }
+        }
+
+    }
+
+    public void receiveIntentInformation() {
+//        Log.e("receiveIntentInfo", "Done");
+        // this method will called from HomePageFragment for editting the note
+        // the bit value is 1 now
+        Bundle bundle = getIntent().getExtras();
+        HomeModel model = (HomeModel) bundle.getSerializable("model");
+        id = model.getId();
+        this.model.setId(model.getId());
+        this.model.setTitle(model.getTitle());
+        this.model.setNote(model.getNote());
+        this.model.setColor(String.valueOf(model.getColor()));
+        this.model.setPluginsID(model.getPluginId());
+        this.model.setFavourite(model.getFavorite());
+        this.model.setLock(model.getPinToTaskbar());
+//        Log.e("favorite state ", "" + this.model.getFavourite());
+        titleEditText.setText(model.getTitle());
+        writeNote.setText(model.getNote());
+        writeNote.setBackgroundResource(model.getColor());
+        if (this.model.getFavourite() == 1) {
+//            Log.e("favorite received", "1");
+            itemFavorite.setChecked(true);
+        }
+
+        if (this.model.getLock() == 1) {
+            itemLock.setChecked(true);
+        }
 
     }
 
@@ -185,34 +325,52 @@ public class AddNoteActivity extends AppCompatActivity implements AddNoteView, D
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.color_list_green:
-                Log.e("green", "green");
                 writeNote.setBackgroundResource(R.color.green);
+                model.setColor("" + R.color.green);
+                Log.e("green", "" + R.color.green);
                 break;
             case R.id.color_list_blue:
-                Log.e("blue", "blue");
                 writeNote.setBackgroundColor(getResources().getColor(R.color.blue));
+                model.setColor("" + R.color.blue);
                 break;
             case R.id.color_list_pink:
                 writeNote.setBackgroundColor(getResources().getColor(R.color.pink));
+                model.setColor("" + R.color.pink);
                 break;
             case R.id.color_list_purple:
                 writeNote.setBackgroundColor(getResources().getColor(R.color.purple));
+                model.setColor("" + R.color.purple);
                 break;
             case R.id.color_list_white:
                 writeNote.setBackgroundColor(getResources().getColor(R.color.white));
+                model.setColor("" + R.color.white);
                 break;
             case R.id.color_list_yellow:
                 writeNote.setBackgroundColor(getResources().getColor(R.color.yellow));
+                model.setColor("" + R.color.yellow);
+                break;
+            case R.id.color_list_orange:
+                writeNote.setBackgroundColor(getResources().getColor(R.color.orange));
+                model.setColor("" + R.color.orange);
                 break;
             case R.id.color_list_brown:
                 writeNote.setBackgroundResource(R.drawable.brown_wallpaper);
+                model.setColor("" + R.drawable.brown_wallpaper);
+                Log.e("brown ", "" + R.drawable.brown_wallpaper);
                 break;
             case R.id.color_list_greenWallpaper:
                 writeNote.setBackgroundResource(R.drawable.green_wallpaper);
+                model.setColor("" + R.drawable.green_wallpaper);
                 break;
             case R.id.color_list_default:
                 writeNote.setBackgroundResource(R.drawable.rosewallpaper);
+                model.setColor("" + R.drawable.rosewallpaper);
+                break;
+            case R.id.color_list_random:
+                writeNote.setBackgroundResource(R.drawable.random_wallpaper);
+                model.setColor("" + R.drawable.random_wallpaper);
                 break;
         }
     }
+
 }
