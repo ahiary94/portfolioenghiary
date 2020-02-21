@@ -7,24 +7,21 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/notes_logo"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".plugins.PluginsGridActivity"></activity>
         <activity
             android:name=".plugins.favourite.FavouriteActivity"
-            android:label="@string/favourite_list"></activity>
+            android:label="@string/favourite_list" />
         <activity
             android:name=".plugins.positivequotes.PositiveQuotesActivity"
             android:label="@string/positive" />
-
         <activity
             android:name=".TestingActivity"
-            android:label="Testing">
-
-        </activity>
-
+            android:label="Testing"></activity>
         <activity
             android:name=".plugins.CalenderActivity"
             android:label="@string/calender" />
@@ -49,9 +46,7 @@
         <activity
             android:name=".SplashAct"
             android:label="My notes"
-            android:noHistory="false" >
-
-        </activity>
+            android:noHistory="false"></activity>
     </application>
 
 </manifest>

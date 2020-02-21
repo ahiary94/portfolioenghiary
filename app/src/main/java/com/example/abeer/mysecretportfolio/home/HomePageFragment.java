@@ -19,12 +19,13 @@ import com.example.abeer.mysecretportfolio.models.AddNoteModel;
 import com.example.abeer.mysecretportfolio.models.HomeModel;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class HomePageFragment extends Fragment implements HomeView {
+public class HomePageFragment extends Fragment{
 
     private RecyclerView recyclerView;
     private HomeRecyclerAdapter adapter;
-    private ArrayList<HomeModel> list = new ArrayList<>();
+    private List<HomeModel> list = new ArrayList<>();
     private Cursor cursor;
     private AddNoteDatabase database;
 
@@ -54,30 +55,30 @@ public class HomePageFragment extends Fragment implements HomeView {
     }
 
 
-    @Override
     public void getRecyclerItems() {
-        cursor = database.selectAllContent();
-        if (cursor.moveToFirst()) {
-            do {
-                HomeModel model = new HomeModel();
-                model.setId(cursor.getInt(0));
-                model.setTitle(cursor.getString(1));
-                model.setNote(cursor.getString(2));
-                model.setColor(Integer.parseInt(cursor.getString(3)));
-                model.setPluginId(cursor.getInt(4));
-                model.setFavorite(cursor.getInt(5));
-                model.setPinToTaskbar(cursor.getInt(6));
-
-                Log.e("id " ,"" + model.getId());
-                Log.e("fav " ,"" + model.getFavorite());
-
-                list.add(model);
-            } while (cursor.moveToNext());
-        }
+        list.clear();
+        list = database.selectAllContent();
+        Log.e("size from db", "" + list.size());
+//        if (cursor.moveToFirst()) {
+//            do {
+//                HomeModel model = new HomeModel();
+//                model.setId(cursor.getInt(0));
+//                model.setTitle(cursor.getString(1));
+//                model.setNote(cursor.getString(2));
+//                model.setColor(Integer.parseInt(cursor.getString(3)));
+//                model.setPluginId(cursor.getInt(4));
+//                model.setFavorite(cursor.getInt(5));
+//                model.setPinToTaskbar(cursor.getInt(6));
+//
+//                Log.e("id " ,"" + model.getId());
+//                Log.e("fav " ,"" + model.getFavorite());
+//
+//                list.add(model);
+//            } while (cursor.moveToNext());
+//        }
 //        cursor.close();
     }
 
-    @Override
     public void goToAddNotePageForEditting(HomeModel model) {
         Intent intent = new Intent(getActivity(), AddNoteActivity.class);
         Bundle bundle = new Bundle();
@@ -91,7 +92,6 @@ public class HomePageFragment extends Fragment implements HomeView {
 
     }
 
-    @Override
     public Context getHomeContext() {
         return getContext();
     }

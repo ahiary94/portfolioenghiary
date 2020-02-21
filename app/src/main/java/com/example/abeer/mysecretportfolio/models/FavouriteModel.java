@@ -1,4 +1,4 @@
-package com.example.abeer.mysecretportfolio.plugins.favourite;
+package com.example.abeer.mysecretportfolio.models;
 
 public class FavouriteModel {
 
@@ -8,10 +8,24 @@ public class FavouriteModel {
 
     private String note;
 
-    public FavouriteModel(String title, String note,int backgroundColor) {
+    private int id;
+
+    public FavouriteModel() {
+    }
+
+    public FavouriteModel(int id, String title, String note, int backgroundColor) {
+        this.id = id;
         this.title = title;
         this.note = note;
         this.backgroundColor = backgroundColor;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getBackgroundColor() {

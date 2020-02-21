@@ -7,14 +7,16 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.abeer.mysecretportfolio.R;
+import com.example.abeer.mysecretportfolio.models.FavouriteModel;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FavouriteRecyclerAdapter extends RecyclerView.Adapter<FavouriteViewHolder> {
 
-    private ArrayList<FavouriteModel> list;
+    private List<FavouriteModel> list;
 
-    public FavouriteRecyclerAdapter(ArrayList<FavouriteModel> list) {
+    public FavouriteRecyclerAdapter(List<FavouriteModel> list) {
         this.list = list;
     }
 

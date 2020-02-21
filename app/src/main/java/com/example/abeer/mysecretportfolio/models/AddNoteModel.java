@@ -7,19 +7,12 @@ public class AddNoteModel {
     // 1 => for edit
 
     private int id;
-
     private String title;
-
     private String note;
-
     private String color;
-
     private int pluginsID;
-
     private int lock;
-
     private int secret;
-
     private int favourite;
 
     public AddNoteModel() {

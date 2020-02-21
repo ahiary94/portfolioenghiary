@@ -8,14 +8,17 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.example.abeer.mysecretportfolio.home.HomeRecyclerAdapter;
+import com.example.abeer.mysecretportfolio.models.AddNoteModel;
+import com.example.abeer.mysecretportfolio.models.FavouriteModel;
+import com.example.abeer.mysecretportfolio.models.HomeModel;
 
-import static android.os.Build.ID;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AddNoteDatabase extends SQLiteOpenHelper {
 
     private static final String NOTE_DB_NAME = "myNoteAppDB";
-    private static final int NOTE_DB_VERSION = 1;
+    private static final int NOTE_DB_VERSION = 3;
 
     private String NOTES_TABLE = "notes_table";
 
@@ -24,12 +27,14 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
     private String NOTES_NOTE = "note";
     private String NOTES_COLOR = "color";
     // **********************************************************
-    private String PLUGUNS_TABLE = "plugins_table";
+    private String PLUGINS_TABLE = "plugins_table";
 
-    private String PLUGUNS_ID = "plugin_id";
-    private String PLUGUNS_RID = "plugin_rid";
-    private String PLUGUNS_FAVORITE = "favorite";
-    private String PLUGUNS_LOCK = "lock";
+    private String PLUGINS_ID = "plugin_id";
+    private String PLUGINS_RID = "plugin_rid";
+    private String PLUGINS_FAVORITE = "favorite";
+    private String PLUGINS_LOCK = "lock";
+    private String PLUGINS_SECRET = "secret";
+
     // **********************************************************
     private String PASSWORD_TABLE = "password_table";
 
@@ -57,11 +62,12 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
                 + NOTES_NOTE + " VARCHAR,"
                 + NOTES_COLOR + " VARCHAR);";
 
-        String sqlQuery2 = "CREATE TABLE IF NOT EXISTS " + PLUGUNS_TABLE + "("
-                + PLUGUNS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + PLUGUNS_RID + " INTEGER,"
-                + PLUGUNS_FAVORITE + " INTEGER,"
-                + PLUGUNS_LOCK + " INTEGER,FOREIGN KEY(" + PLUGUNS_RID + ") REFERENCES tableOfMyNote(" + NOTES_ID + "));";
+        String sqlQuery2 = "CREATE TABLE IF NOT EXISTS " + PLUGINS_TABLE + "("
+                + PLUGINS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + PLUGINS_RID + " INTEGER,"
+                + PLUGINS_FAVORITE + " INTEGER,"
+                + PLUGINS_LOCK + " INTEGER,"
+                + PLUGINS_SECRET + " INTEGER,FOREIGN KEY(" + PLUGINS_RID + ") REFERENCES tableOfMyNote(" + NOTES_ID + "));";
 
         String sqlQuery3 = "CREATE TABLE IF NOT EXISTS " + PASSWORD_TABLE + "("
                 + PASSWORD + "VARCHAR);";
@@ -81,8 +87,10 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("ALTER TABLE " + PLUGINS_TABLE + " ADD COLUMN " + PLUGINS_SECRET + " INTEGER");
+
         String sqlQuery = "DROP TABLE IF EXISTS " + NOTES_TABLE;
-        String sqlQuery2 = "DROP TABLE IF EXISTS " + PLUGUNS_TABLE;
+        String sqlQuery2 = "DROP TABLE IF EXISTS " + PLUGINS_TABLE;
         String sqlQuery3 = "DROP TABLE IF EXISTS " + PASSWORD_TABLE;
         String sqlQuery4 = "DROP TABLE IF EXISTS " + SECRET_TABLE;
 
@@ -105,14 +113,15 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
         return true;
     }
 
-    public boolean addPluginsContent(int id, int favourite, int lock) {
+    public boolean addPluginsContent(int id, int favourite, int lock, int secret) {
         SQLiteDatabase database = getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(PLUGUNS_RID, id);
-        contentValues.put(PLUGUNS_FAVORITE, favourite);
-        contentValues.put(PLUGUNS_LOCK, lock);
+        contentValues.put(PLUGINS_RID, id);
+        contentValues.put(PLUGINS_FAVORITE, favourite);
+        contentValues.put(PLUGINS_LOCK, lock);
+        contentValues.put(PLUGINS_SECRET, secret);
 
-        database.insert(PLUGUNS_TABLE, null, contentValues);
+        database.insert(PLUGINS_TABLE, null, contentValues);
         return true;
     }
 
@@ -148,12 +157,14 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
         database.update(NOTES_TABLE, contentValues, NOTES_ID + " = ?", new String[]{String.valueOf(id)});
     }
 
-    public void updatePlugins(int id, int favorite, int lock) {
+    public void updatePlugins(int id, int favorite, int lock, int secret) {
         SQLiteDatabase database = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(PLUGUNS_FAVORITE, favorite);
-        contentValues.put(PLUGUNS_LOCK, lock);
-        database.update(PLUGUNS_TABLE, contentValues, PLUGUNS_RID + " = ?", new String[]{String.valueOf(id)});
+        contentValues.put(PLUGINS_FAVORITE, favorite);
+        contentValues.put(PLUGINS_LOCK, lock);
+        contentValues.put(PLUGINS_SECRET, secret);
+
+        database.update(PLUGINS_TABLE, contentValues, PLUGINS_RID + " = ?", new String[]{String.valueOf(id)});
     }
 
     public void updateSecretPassword(String newPassword) {
@@ -180,12 +191,35 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
     public void clearNote(int id) {
         SQLiteDatabase database = this.getWritableDatabase();
         database.delete(NOTES_TABLE, NOTES_ID + " = ?", new String[]{String.valueOf(id)});
+        database.delete(PLUGINS_TABLE, PLUGINS_RID + " = ?", new String[]{String.valueOf(id)});
+
     }
 
-    public Cursor selectAllContent() {
+    public List<HomeModel> selectAllContent() {
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT note_id,title,note,color,plugin_rid,favorite,lock FROM notes_table,plugins_table";
-        Cursor c = db.rawQuery(query, null);
+        String query = "SELECT note_id,title,note,color,plugin_rid,favorite,lock,secret FROM notes_table,plugins_table WHERE \n" +
+                "note_id == plugin_rid";
+        Cursor cursor = db.rawQuery(query, null);
+        List<HomeModel> list = new ArrayList<>();
+        if (cursor.moveToFirst())
+            do {
+                HomeModel model = new HomeModel();
+                model.setId(cursor.getInt(0));
+                model.setTitle(cursor.getString(1));
+                model.setNote(cursor.getString(2));
+                model.setColor(Integer.parseInt(cursor.getString(3)));
+                model.setPluginId(cursor.getInt(4));
+                model.setFavorite(cursor.getInt(5));
+                model.setPinToTaskbar(cursor.getInt(6));
+                model.setSecret(cursor.getInt(7));
+
+//                Log.e("id ", "" + model.getId());
+//                Log.e("fav ", "" + model.getFavorite());
+                Log.e("secretDB ", "" + model.getSecret());
+
+                list.add(model);
+            } while (cursor.moveToNext());
+
 //        if (c.moveToFirst()){
 //            do {
 //                // Passing values
@@ -199,29 +233,106 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
 //        }
 //        c.close();
 //        db.close();
-        return c;
+        return list;
+    }
+
+//    public List<AddNoteModel> selectSecretContent() {
+//        SQLiteDatabase db = this.getReadableDatabase();
+//        String query = "SELECT note_id,title,note,color,favorite,lock FROM notes_table,plugins_table WHERE \n" +
+//                "note_id == plugin_rid AND lock = 1";
+//        Cursor cursor = db.rawQuery(query, null);
+//        List<AddNoteModel> list = new ArrayList<>();
+//        if (cursor.moveToFirst())
+//            do {
+//                AddNoteModel model = new HomeModel();
+//                model.setId(cursor.getInt(0));
+//                model.setTitle(cursor.getString(1));
+//                model.setNote(cursor.getString(2));
+//                model.setColor(Integer.parseInt(cursor.getString(3)));
+////                model.setPluginId(cursor.getInt(4));
+//                model.setFavourite(cursor.getInt(4));
+//                model.setPinToTaskbar(cursor.getInt(5));
+//
+//                Log.e("id " ,"" + model.getId());
+//                Log.e("fav " ,"" + model.getFavorite());
+//
+//                list.add(model);
+//            } while (cursor.moveToNext());
+//
+////        if (c.moveToFirst()){
+////            do {
+////                // Passing values
+////                String column1 = c.getString(0);
+////                Log.e("Title", column1);
+////                String column2 = c.getString(1);
+////                Log.e("not", column2);
+////                String column3 = c.getString(2);
+////                Log.e("color", column3);
+////            } while(c.moveToNext());
+////        }
+////        c.close();
+////        db.close();
+//        return list;
+//    }
+
+    public List<FavouriteModel> selectFavouriteContent() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT note_id,title,note,color FROM notes_table,plugins_table WHERE \n" +
+                "note_id == plugin_rid AND favorite = 1";
+        Cursor cursor = db.rawQuery(query, null);
+        List<FavouriteModel> list = new ArrayList<>();
+        if (cursor.moveToFirst())
+            do {
+                FavouriteModel model = new FavouriteModel();
+                model.setId(cursor.getInt(0));
+                model.setTitle(cursor.getString(1));
+                model.setNote(cursor.getString(2));
+                model.setBackgroundColor(cursor.getInt(3));
+//                model.setColor(cursor.getString(3));
+//                model.setPluginId(cursor.getInt(4));
+//                model.setFavorite(cursor.getInt(5));
+//                model.setPinToTaskbar(cursor.getInt(6));
+//                Log.e("id " ,"" + model.getId());
+//                Log.e("fav " ,"" + model.getFavorite());
+                list.add(model);
+            } while (cursor.moveToNext());
+
+//        if (c.moveToFirst()){
+//            do {
+//                // Passing values
+//                String column1 = c.getString(0);
+//                Log.e("Title", column1);
+//                String column2 = c.getString(1);
+//                Log.e("not", column2);
+//                String column3 = c.getString(2);
+//                Log.e("color", column3);
+//            } while(c.moveToNext());
+//        }
+//        c.close();
+//        db.close();
+        return list;
     }
 
     public Cursor selectPluginsContent() {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT plugin_rid,favorite,lock FROM plugins_table ", null);
+        Cursor cursor = db.rawQuery("SELECT plugin_rid,favorite,lock,secret FROM plugins_table ", null);
         return cursor;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////// down error
     public Cursor selectSpecificPluginsContent(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT plugin_rid,favorite,lock FROM plugins_table WHERE plugin_rid=?";
+        String query = "SELECT plugin_rid,favorite,lock,secret FROM plugins_table WHERE plugin_rid=?";
         Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(id)});
         return cursor;
     }
 
-    public Cursor selectFavouriteContent() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT title,note,color FROM notes_table,plugins_table WHERE favorite = 1";
-        Cursor cursor = db.rawQuery(query, null);
-        return cursor;
-    }
+//    public Cursor selectFavouriteContent() {
+//        SQLiteDatabase db = this.getReadableDatabase();
+//        String query = "SELECT title,note,color FROM notes_table,plugins_table WHERE favorite = 1";
+//        Cursor cursor = db.rawQuery(query, null);
+//        return cursor;
+//    }
 
     public Cursor selectTheLastRow() {
         SQLiteDatabase db = this.getReadableDatabase();

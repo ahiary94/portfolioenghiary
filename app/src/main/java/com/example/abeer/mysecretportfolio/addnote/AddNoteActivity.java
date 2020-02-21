@@ -6,14 +6,17 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.abeer.mysecretportfolio.AddNoteDatabase;
@@ -25,34 +28,20 @@ import com.example.abeer.mysecretportfolio.models.AddNoteModel;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class AddNoteActivity extends AppCompatActivity implements AddNoteView, View.OnClickListener, DialogInterface.OnClickListener {
+
     private Toolbar toolbar;
+    private LinearLayout coordinatorLayout;
+    private Snackbar snackbar;
     private Activity activity;
-    private EditText writeNote;
-    private EditText titleEditText;
-    private CircleImageView pinkTextView;
-    private CircleImageView yellowTextView;
-    private CircleImageView blueTextView;
-    private CircleImageView whiteTextView;
-    private CircleImageView greenTextView;
-    private CircleImageView purpleTextView;
-    private CircleImageView orangeTextView;
-    private CircleImageView defaultTextView;
-    private CircleImageView greenWallpaperTextView;
-    private CircleImageView brownTextView;
-    private CircleImageView randomTextView;
+    private EditText writeNote, titleEditText;
+    private CircleImageView pinkTextView, yellowTextView, blueTextView, whiteTextView, greenTextView, purpleTextView, orangeTextView, defaultTextView, greenWallpaperTextView, brownTextView, randomTextView;
     private AddNoteDatabase addNoteDatabase;
     private AddNoteModel model;
     private int id = 0;
     private NotificationManager mNotificationManager;
     private threadClassPart threadClassPart;
-    private final int idSave = 1;
-    private final int idDelete = 2;
-    private final int idFavorite = 3;
-    private final int idLock = 4;
-    private MenuItem itemFavorite;
-    private MenuItem itemLock;
-    private MenuItem itemSave;
-    private MenuItem itemDelete;
+    private final int idSave = 1, idDelete = 2, idFavorite = 3, idLock = 4, idSecret = 5;
+    private MenuItem itemFavorite, itemLock, itemSave, itemDelete, itemSecret;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +50,8 @@ public class AddNoteActivity extends AppCompatActivity implements AddNoteView, V
         activity = this;
 
         toolbar = findViewById(R.id.add_note_toolbar);
+        coordinatorLayout = findViewById(R.id.add_note_coordinatorLayout);
+
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -107,6 +98,7 @@ public class AddNoteActivity extends AppCompatActivity implements AddNoteView, V
         itemDelete = menu.add(Menu.NONE, idDelete, 2, "Delete");
         itemFavorite = menu.add(Menu.NONE, idFavorite, 3, "Favorite");
         itemLock = menu.add(Menu.NONE, idLock, 4, "Lock");
+        itemSecret = menu.add(Menu.NONE, idSecret, 5, "Secret");
 
         itemSave.setIcon(R.drawable.ic_save_black_24dp);
         itemDelete.setIcon(R.drawable.ic_delete_black_24dp);
@@ -114,6 +106,7 @@ public class AddNoteActivity extends AppCompatActivity implements AddNoteView, V
         itemDelete.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         itemFavorite.setCheckable(true);
         itemLock.setCheckable(true);
+        itemSecret.setCheckable(true);
 
         if (AddNoteModel.bit == 1) {
             receiveIntentInformation();
@@ -162,7 +155,18 @@ public class AddNoteActivity extends AppCompatActivity implements AddNoteView, V
 //                    Log.e("locked", "" + model.getLock());
                 }
                 break;
-
+            case 5:
+                itemSecret.setCheckable(true);
+                if (model.getSecret() == 0) {
+                    model.setSecret(1);
+                    itemSecret.setChecked(true);
+                    Log.e("secret", "" + model.getSecret());
+                } else {
+                    model.setSecret(0);
+                    itemSecret.setChecked(false);
+                    Log.e("secret", "" + model.getSecret());
+                }
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -180,10 +184,9 @@ public class AddNoteActivity extends AppCompatActivity implements AddNoteView, V
     @Override
     public void onBackPressed() {
 //        super.onBackPressed();
-        AddNoteModel.bit = 0;
-        Intent homeIntent = new Intent(AddNoteActivity.this, MainActivity.class);
-        startActivity(homeIntent);
-        finish();
+        if (!TextUtils.isEmpty(writeNote.getText().toString())
+                && !TextUtils.isEmpty(titleEditText.getText().toString()))
+            saveNote();
     }
 
     @Override
@@ -211,21 +214,28 @@ public class AddNoteActivity extends AppCompatActivity implements AddNoteView, V
 
     @Override
     public void saveNote() {
+
         model.setNote("" + writeNote.getText());
         model.setTitle("" + titleEditText.getText());
-        if (AddNoteModel.bit == 0) {
+        if (AddNoteModel.bit == 0) { // new note
 //            Log.e("after adding to db", "" + model.getId());
             addNoteDatabase.addContent(model.getTitle(), model.getNote(), model.getColor());
 //            Log.e("...........", "savePluginsInformation");
             threadClassPart = new threadClassPart();////////////////
             threadClassPart.start();///////////////
-            Toast.makeText(this, "The Note Saved", Toast.LENGTH_SHORT).show();
-        } else if (AddNoteModel.bit == 1) {
+//            snackbar = Snackbar.make(coordinatorLayout, "Added Successfully", Snackbar.LENGTH_SHORT);
+//            snackbar.show();
+            Toast.makeText(this, "Added Successfully", Toast.LENGTH_SHORT).show();
+        } else if (AddNoteModel.bit == 1) { // edit note
             addNoteDatabase.updateContent(id, model.getTitle(), model.getNote(), model.getColor());
             Log.e("fav after edit", "" + model.getFavourite());
             Log.e("lock after edit", "" + model.getLock());
-            addNoteDatabase.updatePlugins(model.getPluginsID(), model.getFavourite(), model.getLock());
+            addNoteDatabase.updatePlugins(model.getPluginsID(), model.getFavourite(), model.getLock(), model.getSecret());
+            Toast.makeText(this, "Updated Successfully", Toast.LENGTH_SHORT).show();
+//            snackbar = Snackbar.make(coordinatorLayout, "Updated Successfully", Snackbar.LENGTH_SHORT);
+//            snackbar.show();
         }
+
         AddNoteModel.bit = 0;
         Intent goToHome = new Intent(AddNoteActivity.this, MainActivity.class);
         startActivity(goToHome);
@@ -243,7 +253,7 @@ public class AddNoteActivity extends AppCompatActivity implements AddNoteView, V
                     int noteID = cursor.getInt(0);
                     Log.e("returned id", "" + noteID);
                     cursor.close();
-                    addNoteDatabase.addPluginsContent(noteID, model.getFavourite(), model.getLock());
+                    addNoteDatabase.addPluginsContent(noteID, model.getFavourite(), model.getLock(), model.getSecret());
                     Cursor cursor1 = addNoteDatabase.selectPluginsContent();
                     if (cursor1.moveToFirst()) {
                         do {
@@ -253,7 +263,8 @@ public class AddNoteActivity extends AppCompatActivity implements AddNoteView, V
                             Log.e("fav", "" + column2);
                             int column3 = cursor1.getInt(2);
                             Log.e("lock", "" + column3);
-
+                            int column4 = cursor1.getInt(3);
+                            Log.e("secret", "" + column4);
                         } while (cursor1.moveToNext());
                     }
                     cursor1.close();
@@ -306,6 +317,8 @@ public class AddNoteActivity extends AppCompatActivity implements AddNoteView, V
         this.model.setPluginsID(model.getPluginId());
         this.model.setFavourite(model.getFavorite());
         this.model.setLock(model.getPinToTaskbar());
+        this.model.setSecret(model.getSecret());
+
 //        Log.e("favorite state ", "" + this.model.getFavourite());
         titleEditText.setText(model.getTitle());
         writeNote.setText(model.getNote());
@@ -314,9 +327,11 @@ public class AddNoteActivity extends AppCompatActivity implements AddNoteView, V
 //            Log.e("favorite received", "1");
             itemFavorite.setChecked(true);
         }
-
         if (this.model.getLock() == 1) {
             itemLock.setChecked(true);
+        }
+        if (this.model.getSecret() == 1) {
+            itemSecret.setChecked(true);
         }
 
     }
@@ -372,5 +387,6 @@ public class AddNoteActivity extends AppCompatActivity implements AddNoteView, V
                 break;
         }
     }
+
 
 }

@@ -22,6 +22,7 @@ import com.example.abeer.mysecretportfolio.addnote.AddNoteActivity;
 import com.example.abeer.mysecretportfolio.models.AddNoteModel;
 import com.example.abeer.mysecretportfolio.home.HomePageFragment;
 import com.example.abeer.mysecretportfolio.plugins.CalenderActivity;
+import com.example.abeer.mysecretportfolio.plugins.PluginsGridActivity;
 import com.example.abeer.mysecretportfolio.plugins.favourite.FavouriteActivity;
 import com.example.abeer.mysecretportfolio.plugins.positivequotes.PositiveQuotesActivity;
 
@@ -112,14 +113,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 builder.show();
                 break;
             case R.id.plugins_secret:
+                Intent intent0 = new Intent(MainActivity.this, PluginsGridActivity.class);
+                intent0.putExtra("flag", 11); // secret
+                startActivity(intent0);
+                break;
+            case R.id.plugins_star_list:
+                Intent intent1 = new Intent(MainActivity.this, PluginsGridActivity.class);
+                intent1.putExtra("flag", 12); // favourite
+                startActivity(intent1);
+//                Intent intent1 = new Intent(MainActivity.this, FavouriteActivity.class);
+//                startActivity(intent1);
                 break;
             case R.id.plugins_positive:
                 Intent intent = new Intent(MainActivity.this, PositiveQuotesActivity.class);
                 startActivity(intent);
-                break;
-            case R.id.plugins_star_list:
-                Intent intent1 = new Intent(MainActivity.this, FavouriteActivity.class);
-                startActivity(intent1);
                 break;
             case R.id.plugins_exit:
                 AlertDialog.Builder builder1 = new AlertDialog.Builder(this);

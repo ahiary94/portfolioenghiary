@@ -5,18 +5,21 @@ import java.io.Serializable;
 public class HomeModel implements Serializable {
 
     private int id;
-
     private String title;
-
     private String note;
-
     private int color;
-
     private int pluginId;
-
     private int favorite;
-
     private int pinToTaskbar;
+    private int secret;
+
+    public int getSecret() {
+        return secret;
+    }
+
+    public void setSecret(int secret) {
+        this.secret = secret;
+    }
 
     public int getId() {
         return id;
