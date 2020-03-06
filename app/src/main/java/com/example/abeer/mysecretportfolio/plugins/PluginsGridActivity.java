@@ -42,7 +42,7 @@ public class PluginsGridActivity extends AppCompatActivity {
         } else if (flag == 12) {
             // favourite
 //            list.clear();
-//            list = database.selectFavouriteContent();
+//            list = database.selectFavouriteContent();dddd
             Intent intent = new Intent(this, FavouriteActivity.class);
             startActivity(intent);
         }
