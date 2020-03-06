@@ -18,12 +18,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.example.abeer.mysecretportfolio.addnote.AddNoteActivity;
 import com.example.abeer.mysecretportfolio.models.AddNoteModel;
 import com.example.abeer.mysecretportfolio.home.HomePageFragment;
 import com.example.abeer.mysecretportfolio.plugins.CalenderActivity;
 import com.example.abeer.mysecretportfolio.plugins.PluginsGridActivity;
-import com.example.abeer.mysecretportfolio.plugins.favourite.FavouriteActivity;
 import com.example.abeer.mysecretportfolio.plugins.positivequotes.PositiveQuotesActivity;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, DialogInterface.OnClickListener {

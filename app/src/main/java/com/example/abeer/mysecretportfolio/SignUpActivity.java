@@ -1,4 +1,4 @@
-package com.example.abeer.mysecretportfolio.signup;
+package com.example.abeer.mysecretportfolio;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -13,14 +13,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.android.volley.VolleyError;
-import com.example.abeer.mysecretportfolio.MainActivity;
-import com.example.abeer.mysecretportfolio.R;
 import com.example.abeer.mysecretportfolio.models.SignupModel;
-import com.example.abeer.mysecretportfolio.users_account;
 
 import org.json.JSONObject;
 
-public class signUpAct extends AppCompatActivity implements SignupView, View.OnClickListener {
+public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
 
     private EditText suser;
     private EditText spass;
@@ -45,36 +42,30 @@ public class signUpAct extends AppCompatActivity implements SignupView, View.OnC
         pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
     }
 
-    @Override
     public void showLoading() {
         pd.show();
     }
 
-    @Override
     public void dismissLoading() {
         pd.dismiss();
     }
 
-    @Override
     public Context getSignupContext() {
         return getBaseContext();
     }
 
-    @Override
     public String getUsername() {
         return model.getUsername();
     }
 
-    @Override
     public String getUserPassword() {
         return model.getPassword();
     }
 
-    @Override
     public void onResponse(JSONObject response) {
         if (response.equals("0"))
             // "0" mean that the uaser acyually exist and there is a data
-            Toast.makeText(signUpAct.this, "User alraedy exist", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignUpActivity.this, "User alraedy exist", Toast.LENGTH_SHORT).show();
         else {
             String password = spass.getText().toString();
             //condition to prevent the user from enter password less than 6 characters will appear in the form of error
@@ -85,7 +76,7 @@ public class signUpAct extends AppCompatActivity implements SignupView, View.OnC
                 users_account.usersAccount = suser.getText().toString();
                 spass.setError(null);
                 // users_account.uId= response.getBytes;
-                Intent i = new Intent(signUpAct.this, MainActivity.class);
+                Intent i = new Intent(SignUpActivity.this, MainActivity.class);
                 startActivity(i);
             }
         }
@@ -98,7 +89,7 @@ public class signUpAct extends AppCompatActivity implements SignupView, View.OnC
             if (!TextUtils.isEmpty(suser.getText()) && !TextUtils.isEmpty(spass.getText()) && !TextUtils.isEmpty(scon.getText())) {
                 model = new SignupModel(suser.getText().toString(), spass.getText().toString());
                 if (model.getPassword().equals(scon.getText().toString())) {
-                    new SignupPresenter(this).onConnect();
+                    new NotesPresenter(this).onConnect();
                 } else
                     Toast.makeText(this, "Password not match", Toast.LENGTH_SHORT).show();
             } else {
@@ -108,7 +99,6 @@ public class signUpAct extends AppCompatActivity implements SignupView, View.OnC
         }
     }
 
-    @Override
     public void onFailer(VolleyError error) {
         Toast.makeText(this, "There is error ...", Toast.LENGTH_SHORT).show();
         Log.e("SIGNUP error is", "" + error);

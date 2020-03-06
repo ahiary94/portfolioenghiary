@@ -144,9 +144,6 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
     }
 
     //------------------------------------------------------------------
-//    public
-
-    //------------------------------------------------------------------
 
     public void updateContent(int id, String title, String note, String color) {
         SQLiteDatabase database = this.getWritableDatabase();
@@ -195,6 +192,8 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
 
     }
 
+    //------------------------------------------------------------------
+
     public List<HomeModel> selectAllContent() {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT note_id,title,note,color,plugin_rid,favorite,lock,secret FROM notes_table,plugins_table WHERE \n" +
@@ -236,44 +235,27 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
         return list;
     }
 
-//    public List<AddNoteModel> selectSecretContent() {
-//        SQLiteDatabase db = this.getReadableDatabase();
-//        String query = "SELECT note_id,title,note,color,favorite,lock FROM notes_table,plugins_table WHERE \n" +
-//                "note_id == plugin_rid AND lock = 1";
-//        Cursor cursor = db.rawQuery(query, null);
-//        List<AddNoteModel> list = new ArrayList<>();
-//        if (cursor.moveToFirst())
-//            do {
-//                AddNoteModel model = new HomeModel();
-//                model.setId(cursor.getInt(0));
-//                model.setTitle(cursor.getString(1));
-//                model.setNote(cursor.getString(2));
-//                model.setColor(Integer.parseInt(cursor.getString(3)));
-////                model.setPluginId(cursor.getInt(4));
-//                model.setFavourite(cursor.getInt(4));
-//                model.setPinToTaskbar(cursor.getInt(5));
-//
-//                Log.e("id " ,"" + model.getId());
-//                Log.e("fav " ,"" + model.getFavorite());
-//
-//                list.add(model);
-//            } while (cursor.moveToNext());
-//
-////        if (c.moveToFirst()){
-////            do {
-////                // Passing values
-////                String column1 = c.getString(0);
-////                Log.e("Title", column1);
-////                String column2 = c.getString(1);
-////                Log.e("not", column2);
-////                String column3 = c.getString(2);
-////                Log.e("color", column3);
-////            } while(c.moveToNext());
-////        }
-////        c.close();
-////        db.close();
-//        return list;
-//    }
+    public List<HomeModel> selectSecretContent() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT note_id,title,note,color,secret FROM notes_table,plugins_table WHERE \n" +
+                "note_id == plugin_rid AND secret = 1";
+        Cursor cursor = db.rawQuery(query, null);
+        List<HomeModel> list = new ArrayList<>();
+        if (cursor.moveToFirst())
+            do {
+                HomeModel model = new HomeModel();
+                model.setId(cursor.getInt(0));
+                model.setTitle(cursor.getString(1));
+                model.setNote(cursor.getString(2));
+                model.setColor(Integer.parseInt(cursor.getString(3)));
+                model.setSecret(cursor.getInt(4));
+
+                Log.e("secret page", "secret" + model.getSecret());
+
+                list.add(model);
+            } while (cursor.moveToNext());
+        return list;
+    }
 
     public List<FavouriteModel> selectFavouriteContent() {
         SQLiteDatabase db = this.getReadableDatabase();

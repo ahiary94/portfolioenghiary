@@ -1,4 +1,4 @@
-package com.example.abeer.mysecretportfolio.signup;
+package com.example.abeer.mysecretportfolio;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -7,28 +7,29 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.abeer.mysecretportfolio.BuildConfig;
+import com.example.abeer.mysecretportfolio.SignUpActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class SignupPresenter implements Response.Listener<JSONObject>, Response.ErrorListener {
+public class NotesPresenter implements Response.Listener<JSONObject>, Response.ErrorListener {
 
     private String signupUrl = String.format("%s%s", BuildConfig.URL, "SignUp.php");//192.168.1.12
     private RequestQueue rq;
     private JsonObjectRequest jsonObjectRequest;
-    private SignupView signupView;
+    private SignUpActivity signUpActivity;
 
-    public SignupPresenter(SignupView signupView) {
-        this.signupView = signupView;
-        this.rq = Volley.newRequestQueue(signupView.getSignupContext());
+    public NotesPresenter(SignUpActivity signUpActivity) {
+        this.signUpActivity = signUpActivity;
+        this.rq = Volley.newRequestQueue(signUpActivity.getSignupContext());
     }
 
     public void onConnect() {
-        signupView.showLoading();
+        signUpActivity.showLoading();
         JSONObject object = new JSONObject();
         try {
-            object.put("username", signupView.getUsername());
-            object.put("password", signupView.getUserPassword());
+            object.put("username", signUpActivity.getUsername());
+            object.put("password", signUpActivity.getUserPassword());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -39,13 +40,13 @@ public class SignupPresenter implements Response.Listener<JSONObject>, Response.
 
     @Override
     public void onResponse(JSONObject response) {
-        signupView.showLoading();
-        signupView.onResponse(response);
+        signUpActivity.showLoading();
+        signUpActivity.onResponse(response);
     }
 
     @Override
     public void onErrorResponse(VolleyError error) {
-        signupView.dismissLoading();
-        signupView.onFailer(error);
+        signUpActivity.dismissLoading();
+        signUpActivity.onFailer(error);
     }
 }

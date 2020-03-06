@@ -26,7 +26,7 @@
             android:name=".plugins.CalenderActivity"
             android:label="@string/calender" />
         <activity
-            android:name=".addnote.AddNoteActivity"
+            android:name=".AddNoteActivity"
             android:label="" />
         <activity
             android:name=".MainActivity"
@@ -41,7 +41,7 @@
             android:name=".passwordAct"
             android:label="Login" />
         <activity
-            android:name=".signup.signUpAct"
+            android:name=".SignUpActivity"
             android:label="Register" />
         <activity
             android:name=".SplashAct"

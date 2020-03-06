@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:id="@+id/add_note_coordinatorLayout"
-    tools:context=".addnote.AddNoteActivity">
+    tools:context=".AddNoteActivity">
 
     <include
         android:id="@+id/add_note_toolbar_activity"

@@ -13,7 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.abeer.mysecretportfolio.R;
-import com.example.abeer.mysecretportfolio.addnote.AddNoteActivity;
+import com.example.abeer.mysecretportfolio.AddNoteActivity;
 import com.example.abeer.mysecretportfolio.AddNoteDatabase;
 import com.example.abeer.mysecretportfolio.models.AddNoteModel;
 import com.example.abeer.mysecretportfolio.models.HomeModel;

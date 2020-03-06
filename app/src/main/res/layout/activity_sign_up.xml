@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.example.abeer.mysecretportfolio.signup.signUpAct"
+    tools:context="com.example.abeer.mysecretportfolio.SignUpActivity"
     android:background="@drawable/rosewallpaper">
 
     <EditText

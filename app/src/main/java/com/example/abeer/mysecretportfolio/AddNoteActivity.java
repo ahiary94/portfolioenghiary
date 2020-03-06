@@ -1,4 +1,4 @@
-package com.example.abeer.mysecretportfolio.addnote;
+package com.example.abeer.mysecretportfolio;
 
 import android.app.Activity;
 import android.app.NotificationManager;
@@ -19,15 +19,12 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.example.abeer.mysecretportfolio.AddNoteDatabase;
-import com.example.abeer.mysecretportfolio.MainActivity;
-import com.example.abeer.mysecretportfolio.R;
 import com.example.abeer.mysecretportfolio.models.HomeModel;
 import com.example.abeer.mysecretportfolio.models.AddNoteModel;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class AddNoteActivity extends AppCompatActivity implements AddNoteView, View.OnClickListener, DialogInterface.OnClickListener {
+public class AddNoteActivity extends AppCompatActivity implements View.OnClickListener, DialogInterface.OnClickListener {
 
     private Toolbar toolbar;
     private LinearLayout coordinatorLayout;
@@ -171,12 +168,10 @@ public class AddNoteActivity extends AppCompatActivity implements AddNoteView, V
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
     public void doFavoriteAction() {
 
     }
 
-    @Override
     public void doLockAction() {
 
     }
@@ -189,7 +184,6 @@ public class AddNoteActivity extends AppCompatActivity implements AddNoteView, V
             saveNote();
     }
 
-    @Override
     public void lockNoteToNotificationBar() {
 //        mNotificationManager = (NotificationManager)
 //                getSystemService(Context.NOTIFICATION_SERVICE);
@@ -212,9 +206,7 @@ public class AddNoteActivity extends AppCompatActivity implements AddNoteView, V
 //        mNotificationManager.notify((int) value, mBuilder.build());
     }
 
-    @Override
     public void saveNote() {
-
         model.setNote("" + writeNote.getText());
         model.setTitle("" + titleEditText.getText());
         if (AddNoteModel.bit == 0) { // new note
@@ -273,7 +265,6 @@ public class AddNoteActivity extends AppCompatActivity implements AddNoteView, V
         }
     }
 
-    @Override
     public void deleteTheNote() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Are You Want Delete it?");
