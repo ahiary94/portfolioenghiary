@@ -16,9 +16,23 @@
     <color name="red">#F18E8E</color>
     <color name="greenTwo">#0EF8E6</color>
     <color name="orangeTwo">#D57F34</color>
+    <color name="red_dark">#D81B1B</color>
 
     <color name="colorList">#B8B6B6</color>
 
     <!--    <color name="colorPrimary">#fde9cdae</color>-->
+
+
+
+    <color name="grayf">#ABFFFFFF</color>
+    <color name="goldf">#C9A63C</color>
+    <color name="gray2f">#59D8D4D4</color>
+    <color name="greenf">#44FF03</color>
+    <color name="redf">#FC2828</color>
+    <color name="yellowf">#DDFF00</color>
+    <color name="gray_darkf">#4B4A4A</color>
+<!--    <color name="gray_darkf">#27274B</color>-->
+    <color name="dark_bluef">#13133D</color>
+    <color name="alpha_grayf">#8D000000</color>
 
 </resources>

@@ -37,4 +37,8 @@ dependencies {
     implementation 'com.mcxiaoke.volley:library:1.0.19'
     implementation 'de.hdodenhof:circleimageview:3.0.0'
 
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.3'
+    debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
+    implementation 'com.etsy.android.grid:library:1.0.5'
+
 }

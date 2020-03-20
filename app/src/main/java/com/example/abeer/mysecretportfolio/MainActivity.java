@@ -1,21 +1,41 @@
 package com.example.abeer.mysecretportfolio;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
+import android.media.MediaRecorder;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.TextureView;
+import android.view.View;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.abeer.mysecretportfolio.models.AddNoteModel;
@@ -23,6 +43,15 @@ import com.example.abeer.mysecretportfolio.home.HomePageFragment;
 import com.example.abeer.mysecretportfolio.plugins.CalenderActivity;
 import com.example.abeer.mysecretportfolio.plugins.PluginsGridActivity;
 import com.example.abeer.mysecretportfolio.plugins.positivequotes.PositiveQuotesActivity;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Date;
+import java.util.Random;
+import java.util.UUID;
+
+import static android.media.MediaRecorder.AudioSource.MIC;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, DialogInterface.OnClickListener {
 
@@ -35,8 +64,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FragmentTransaction transaction;
     private HomePageFragment homePageFragment;
     private AddNoteDatabase database;
-//    private static final int THREAD_ID = 10000;
+    private MediaRecorder mediaRecorder;
+    private MediaPlayer mediaPlayer;
+    private String fileName = "";
+    private int randomNo;
+    private Button recordVoice, playRecord, pauseRecord, deleteRecord, saveRecord, closeDialog, okSecretPassword;
+    private EditText secretPassword;
+    private TextView passwordDialogTitle;
+    private boolean isStartRecording = false;
+    //    private static final int THREAD_ID = 10000;
+    private static final int REQUEST_PERMISSION_CODE = 10000;
+    private Dialog voiceDialog;
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,11 +97,39 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
 
         getHomePage();
-//
+
         pd = new ProgressDialog(this);
         pd.setMessage("Please waiting...");
         pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 
+    }
+
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(this
+                , new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO}
+                , REQUEST_PERMISSION_CODE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_PERMISSION_CODE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(this, "Permission not Granted", Toast.LENGTH_SHORT).show();
+
+                break;
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    private boolean checkDevicePermission() {
+        int writeExternalStorage = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int recordAudioResult = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
+
+        return writeExternalStorage == PackageManager.PERMISSION_GRANTED
+                && recordAudioResult == PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
@@ -79,6 +147,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         transaction.commit();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (toggle.onOptionsItemSelected(item)) {
@@ -87,10 +157,191 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (item.getItemId() == R.id.add_note_btn) {
             Intent intent = new Intent(MainActivity.this, AddNoteActivity.class);
             startActivity(intent);
-        }else if (item.getItemId() == R.id.add_note_voice_message){
+        } else if (item.getItemId() == R.id.add_note_voice_message) {
 
+            voiceDialog = new Dialog(this);
+            voiceDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            voiceDialog.setContentView(R.layout.voice_message_dialog);
+            voiceDialog.setCanceledOnTouchOutside(false);
+            recordVoice = voiceDialog.findViewById(R.id.voiceMessage_record);
+            playRecord = voiceDialog.findViewById(R.id.voiceMessage_play);
+            pauseRecord = voiceDialog.findViewById(R.id.voiceMessage_pause);
+            saveRecord = voiceDialog.findViewById(R.id.voiceMessage_save);
+            deleteRecord = voiceDialog.findViewById(R.id.voiceMessage_delete);
+            closeDialog = voiceDialog.findViewById(R.id.voiceMessage_close);
+
+            recordVoice.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (checkDevicePermission()) {
+
+                        if (!isStartRecording) {
+                            recordVoice.setBackgroundResource(R.drawable.record_start);
+                            isStartRecording = true;
+                            playRecord.setEnabled(false);
+                            pauseRecord.setEnabled(false);
+                            saveRecord.setEnabled(false);
+                            deleteRecord.setEnabled(false);
+//                            Date date = new Date();
+                            fileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + UUID.randomUUID().toString() + "record.3gp";
+                            Log.e("fileName", fileName);
+                            setUpMediaRecorder();
+                            try {
+                                mediaRecorder.prepare();
+                                mediaRecorder.start();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                            Toast.makeText(MainActivity.this, "Recording...", Toast.LENGTH_SHORT).show();
+//                            randomNo = new Random().nextInt(1000);
+//                            fileName += "/noterecord" + randomNo + ".3gp";
+//                            mediaRecorder = new MediaRecorder();
+//                            try {
+//                                mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);  //ok so I say audio source is the microphone, is it windows/linux microphone on the emulator?
+//                            }catch (Exception e){
+//                                Log.e("Exception", e.getMessage().toString());
+//                            }
+//                            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+//                            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+//                            mediaRecorder.setOutputFile("/sdcard/Music/"+System.currentTimeMillis()+".amr");
+//
+//
+//                            if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+//
+//                                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.RECORD_AUDIO},
+//                                        0);
+//                                Toast.makeText(MainActivity.this, "not granted", Toast.LENGTH_SHORT).show();
+//                            } else {
+//                                mediaRecorder.start();
+//                            }
+                        } else {
+                            isStartRecording = false;
+                            playRecord.setEnabled(true);
+                            pauseRecord.setEnabled(true);
+                            saveRecord.setEnabled(true);
+                            deleteRecord.setEnabled(true);
+                            recordVoice.setBackgroundResource(R.drawable.record);
+                            mediaRecorder.stop();
+                            Toast.makeText(MainActivity.this, "Recording stopped", Toast.LENGTH_SHORT).show();
+                        }
+
+                    } else {
+                        requestPermission();
+                    }
+                }
+            });
+//            recordVoice.setOnTouchListener(new View.OnTouchListener() {
+//                @Override
+//                public boolean onTouch(View view, MotionEvent motionEvent) {
+//                    if (checkDevicePermission()) {
+//                        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+//
+//                            recordVoice.setBackgroundResource(R.drawable.record_start);
+//                            fileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + UUID.randomUUID().toString() + "record.3gp";
+//                            setUpMediaRecorder();
+//                            try {
+//                                mediaRecorder.prepare();
+//                                mediaRecorder.start();
+//                            } catch (IOException e) {
+//                                e.printStackTrace();
+//                            }
+//
+//                            Toast.makeText(MainActivity.this, "Recording...", Toast.LENGTH_SHORT).show();
+////                            randomNo = new Random().nextInt(1000);
+////                            fileName += "/noterecord" + randomNo + ".3gp";
+////                            mediaRecorder = new MediaRecorder();
+////                            try {
+////                                mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);  //ok so I say audio source is the microphone, is it windows/linux microphone on the emulator?
+////                            }catch (Exception e){
+////                                Log.e("Exception", e.getMessage().toString());
+////                            }
+////                            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+////                            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+////                            mediaRecorder.setOutputFile("/sdcard/Music/"+System.currentTimeMillis()+".amr");
+////
+////
+////                            if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+////
+////                                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.RECORD_AUDIO},
+////                                        0);
+////                                Toast.makeText(MainActivity.this, "not granted", Toast.LENGTH_SHORT).show();
+////                            } else {
+////                                mediaRecorder.start();
+////                            }
+//
+//                        } else {
+//
+////                            recordVoice.setBackgroundResource(R.drawable.record);
+////                            fileName = Environment.getExternalStorageDirectory().getAbsolutePath();
+////                            randomNo = new Random().nextInt(1000);
+////                            fileName += "/noterecord" + randomNo + ".3gp";
+////                            mediaRecorder.setOutputFile(fileName);
+//                            mediaRecorder.stop();
+//                        }
+//                    } else {
+//                        requestPermission();
+//                    }
+//                    return false;
+//                }
+//            });
+
+            playRecord.setOnClickListener(new VoiceDialogActions());
+            pauseRecord.setOnClickListener(new VoiceDialogActions());
+            closeDialog.setOnClickListener(new VoiceDialogActions());
+
+            voiceDialog.show();
         }
         return true;//super.onOptionsItemSelected(item)
+    }
+
+    class VoiceDialogActions implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            switch (view.getId()) {
+
+                case R.id.voiceMessage_play:
+                    mediaPlayer = new MediaPlayer();
+                    try {
+                        mediaPlayer.setDataSource(fileName);
+                        mediaPlayer.prepare();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    mediaPlayer.start();
+                    Toast.makeText(MainActivity.this, "Started", Toast.LENGTH_SHORT).show();
+                    break;
+                case R.id.voiceMessage_pause:
+                    if (mediaPlayer != null) {
+                        mediaPlayer.stop();
+                        mediaPlayer.release();
+                    }
+                    setUpMediaRecorder();
+                    Toast.makeText(MainActivity.this, "Stopped", Toast.LENGTH_SHORT).show();
+                    break;
+                case R.id.voiceMessage_save:
+
+                    break;
+                case R.id.voiceMessage_delete:
+                    break;
+                case R.id.voiceMessage_close:
+                    if (isStartRecording)
+                        mediaRecorder.stop();
+                    isStartRecording = false;
+                    recordVoice.setBackgroundResource(R.drawable.record);
+                    voiceDialog.dismiss();
+                    break;
+            }
+
+        }
+    }
+
+    private void setUpMediaRecorder() {
+        mediaRecorder = new MediaRecorder();
+        mediaRecorder.setAudioSource(MIC);
+        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        mediaRecorder.setOutputFile(fileName);
     }
 
     @Override
@@ -111,9 +362,47 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 builder.show();
                 break;
             case R.id.plugins_secret:
-                Intent intent0 = new Intent(MainActivity.this, PluginsGridActivity.class);
-                intent0.putExtra("flag", 11); // secret
-                startActivity(intent0);
+                final String password = database.getSecretDialogPassword();
+                final Dialog dialog = new Dialog(this);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setContentView(R.layout.secret_password_dialog);
+
+                passwordDialogTitle = dialog.findViewById(R.id.passwordDialog_title);
+                secretPassword = dialog.findViewById(R.id.passwordDialog_password);
+                okSecretPassword = dialog.findViewById(R.id.passwordDialog_ok);
+                okSecretPassword.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (password.equals("")) { // for the first time
+                            passwordDialogTitle.setText("Add your password");
+                            if (!TextUtils.isEmpty(secretPassword.getText().toString())) {
+                                database.addSecretPassword(secretPassword.getText().toString());
+                                Toast.makeText(MainActivity.this, "Password Added Successfully", Toast.LENGTH_SHORT).show();
+                                dialog.dismiss();
+                                Intent intent0 = new Intent(MainActivity.this, PluginsGridActivity.class);
+                                intent0.putExtra("flag", 11); // secret
+                                startActivity(intent0);
+                            } else
+                                Toast.makeText(MainActivity.this, "Please add password first!", Toast.LENGTH_SHORT).show();
+                        } else {
+                            passwordDialogTitle.setText("Password");
+                            if (!TextUtils.isEmpty(secretPassword.getText().toString())) {
+                                if (secretPassword.getText().toString().equals(password)) {
+                                    Toast.makeText(MainActivity.this, "Password Added Successfully", Toast.LENGTH_SHORT).show();
+                                    dialog.dismiss();
+                                    Intent intent0 = new Intent(MainActivity.this, PluginsGridActivity.class);
+                                    intent0.putExtra("flag", 11); // secret
+                                    startActivity(intent0);
+                                } else {
+                                    Toast.makeText(MainActivity.this, "Password isn't correct!", Toast.LENGTH_SHORT).show();
+                                }
+                            } else {
+                                Toast.makeText(MainActivity.this, "Please fill your password first!", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                });
+                dialog.show();
                 break;
             case R.id.plugins_star_list:
                 Intent intent1 = new Intent(MainActivity.this, PluginsGridActivity.class);

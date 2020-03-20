@@ -3,6 +3,7 @@ package com.example.abeer.mysecretportfolio;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.Nullable;
@@ -18,7 +19,7 @@ import java.util.List;
 public class AddNoteDatabase extends SQLiteOpenHelper {
 
     private static final String NOTE_DB_NAME = "myNoteAppDB";
-    private static final int NOTE_DB_VERSION = 3;
+    private static final int NOTE_DB_VERSION = 5;
 
     private String NOTES_TABLE = "notes_table";
 
@@ -70,7 +71,7 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
                 + PLUGINS_SECRET + " INTEGER,FOREIGN KEY(" + PLUGINS_RID + ") REFERENCES tableOfMyNote(" + NOTES_ID + "));";
 
         String sqlQuery3 = "CREATE TABLE IF NOT EXISTS " + PASSWORD_TABLE + "("
-                + PASSWORD + "VARCHAR);";
+                + PASSWORD + " VARCHAR);";
 
         String sqlQuery4 = "CREATE TABLE IF NOT EXISTS " + SECRET_TABLE + "("
                 + SECRET_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -87,17 +88,18 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("ALTER TABLE " + PLUGINS_TABLE + " ADD COLUMN " + PLUGINS_SECRET + " INTEGER");
+        db.execSQL("ALTER TABLE " + PASSWORD_TABLE + " ADD COLUMN " + PASSWORD + " VARCHAR");
+//        db.execSQL("ALTER TABLE " + PASSWORD_TABLE + " ADD COLUMN " + PASSWORD + " VARCHAR");
 
-        String sqlQuery = "DROP TABLE IF EXISTS " + NOTES_TABLE;
-        String sqlQuery2 = "DROP TABLE IF EXISTS " + PLUGINS_TABLE;
+//        String sqlQuery = "DROP TABLE IF EXISTS " + NOTES_TABLE;
+//        String sqlQuery2 = "DROP TABLE IF EXISTS " + PLUGINS_TABLE;
         String sqlQuery3 = "DROP TABLE IF EXISTS " + PASSWORD_TABLE;
-        String sqlQuery4 = "DROP TABLE IF EXISTS " + SECRET_TABLE;
+//        String sqlQuery4 = "DROP TABLE IF EXISTS " + SECRET_TABLE;
 
-        db.execSQL(sqlQuery);
-        db.execSQL(sqlQuery2);
+//        db.execSQL(sqlQuery);
+//        db.execSQL(sqlQuery2);
         db.execSQL(sqlQuery3);
-        db.execSQL(sqlQuery4);
+//        db.execSQL(sqlQuery4);
 
         onCreate(db);
 
@@ -140,7 +142,6 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
         contentValues.put(SECRET_NOTE, note);
         database.insert(SECRET_TABLE, null, contentValues);
         return true;
-
     }
 
     //------------------------------------------------------------------
@@ -178,7 +179,7 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
         database.update(SECRET_TABLE, contentValues, SECRET_ID + " = ?", new String[]{String.valueOf(id)});
     }
 
-    //------------------------------------------------------------------
+    //--------------------------------- clear ---------------------------------
 
     public void clearDatabase() {
         SQLiteDatabase database = this.getWritableDatabase();
@@ -192,12 +193,12 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
 
     }
 
-    //------------------------------------------------------------------
+    //------------------------------------ select ------------------------------
 
     public List<HomeModel> selectAllContent() {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT note_id,title,note,color,plugin_rid,favorite,lock,secret FROM notes_table,plugins_table WHERE \n" +
-                "note_id == plugin_rid";
+                "note_id == plugin_rid AND secret = 0";
         Cursor cursor = db.rawQuery(query, null);
         List<HomeModel> list = new ArrayList<>();
         if (cursor.moveToFirst())
@@ -212,8 +213,6 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
                 model.setPinToTaskbar(cursor.getInt(6));
                 model.setSecret(cursor.getInt(7));
 
-//                Log.e("id ", "" + model.getId());
-//                Log.e("fav ", "" + model.getFavorite());
                 Log.e("secretDB ", "" + model.getSecret());
 
                 list.add(model);
@@ -299,6 +298,16 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT plugin_rid,favorite,lock,secret FROM plugins_table ", null);
         return cursor;
+    }
+
+    public String getSecretDialogPassword() {
+        String password = "";
+        SQLiteDatabase database = this.getReadableDatabase();
+        Cursor cursor = database.rawQuery("SELECT " + PASSWORD + " FROM " + PASSWORD_TABLE, null);
+        if (cursor.moveToFirst())
+            password = cursor.getString(0);
+        return password;
+
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////// down error

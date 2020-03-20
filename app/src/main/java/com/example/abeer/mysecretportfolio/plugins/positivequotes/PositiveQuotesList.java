@@ -7,9 +7,8 @@ import java.util.ArrayList;
 public class PositiveQuotesList {
 
     private ArrayList<Integer> color = new ArrayList<>();
-
     private ArrayList<String> quote = new ArrayList<>();
-
+//https://stackoverflow.com/questions/9357668/how-to-store-image-in-sqlite-database
 
     public ArrayList<Integer> returnColor() {
         color.add(R.color.blue);

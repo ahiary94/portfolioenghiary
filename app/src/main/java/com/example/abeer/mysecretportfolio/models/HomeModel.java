@@ -12,6 +12,15 @@ public class HomeModel implements Serializable {
     private int favorite;
     private int pinToTaskbar;
     private int secret;
+    private String secretPasswordDialog;
+
+    public String getSecretPasswordDialog() {
+        return secretPasswordDialog;
+    }
+
+    public void setSecretPasswordDialog(String secretPasswordDialog) {
+        this.secretPasswordDialog = secretPasswordDialog;
+    }
 
     public int getSecret() {
         return secret;

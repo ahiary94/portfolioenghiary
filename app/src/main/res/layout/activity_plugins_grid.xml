@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".plugins.PluginsGridActivity">
+
+    <include
+        android:id="@+id/toolbar_favorite_layout"
+        layout="@layout/main_toolbar" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/plugins_activity_recyclerView"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginVertical="5dp"
+        android:paddingHorizontal="10dp"
+        tools:listitem="@layout/recycler_row_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
 
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>

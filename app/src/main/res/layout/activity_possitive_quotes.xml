@@ -10,10 +10,10 @@
         android:id="@+id/toolbar_positiveQuotes_layout"
         layout="@layout/main_toolbar" />
 
-    <android.support.v7.widget.RecyclerView
+    <com.etsy.android.grid.StaggeredGridView
         android:id="@+id/recyclerView_possitive_quotes"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/toolbar_positiveQuotes_layout"></android.support.v7.widget.RecyclerView>
+        android:layout_below="@id/toolbar_positiveQuotes_layout"/>
 
 </RelativeLayout>

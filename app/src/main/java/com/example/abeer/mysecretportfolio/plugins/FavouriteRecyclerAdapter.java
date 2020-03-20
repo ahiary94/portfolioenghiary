@@ -1,4 +1,4 @@
-package com.example.abeer.mysecretportfolio.plugins.favourite;
+package com.example.abeer.mysecretportfolio.plugins;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;

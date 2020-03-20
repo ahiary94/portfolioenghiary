@@ -1,6 +1,7 @@
 package com.example.abeer.mysecretportfolio;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.NotificationManager;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,8 +16,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.abeer.mysecretportfolio.models.HomeModel;
@@ -31,14 +34,15 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
     private Snackbar snackbar;
     private Activity activity;
     private EditText writeNote, titleEditText;
-    private CircleImageView pinkTextView, yellowTextView, blueTextView, whiteTextView, greenTextView, purpleTextView, orangeTextView, defaultTextView, greenWallpaperTextView, brownTextView, randomTextView;
+    private TextView pinkTextView, yellowTextView, blueTextView, whiteTextView, greenTextView, purpleTextView, orangeTextView, defaultTextView, greenWallpaperTextView, brownTextView, randomTextView;
     private AddNoteDatabase addNoteDatabase;
     private AddNoteModel model;
     private int id = 0;
+    private Dialog dialog;
     private NotificationManager mNotificationManager;
     private threadClassPart threadClassPart;
-    private final int idSave = 1, idDelete = 2, idFavorite = 3, idLock = 4, idSecret = 5;
-    private MenuItem itemFavorite, itemLock, itemSave, itemDelete, itemSecret;
+    private final int idSave = 1, idDelete = 2, idFavorite = 3, idLock = 4, idSecret = 5, idColor = 6;
+    private MenuItem itemFavorite, itemLock, itemSave, itemDelete, itemSecret, itemColor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,33 +64,6 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
 
         writeNote = findViewById(R.id.add_note_editText);
         titleEditText = findViewById(R.id.add_note_toolbar_editText);
-        pinkTextView = findViewById(R.id.color_list_pink);
-        yellowTextView = findViewById(R.id.color_list_yellow);
-        blueTextView = findViewById(R.id.color_list_blue);
-        whiteTextView = findViewById(R.id.color_list_white);
-        greenTextView = findViewById(R.id.color_list_green);
-        purpleTextView = findViewById(R.id.color_list_purple);
-        orangeTextView = findViewById(R.id.color_list_orange);
-        defaultTextView = findViewById(R.id.color_list_default);
-        greenWallpaperTextView = findViewById(R.id.color_list_greenWallpaper);
-        brownTextView = findViewById(R.id.color_list_brown);
-        randomTextView = findViewById(R.id.color_list_random);
-
-        pinkTextView.setOnClickListener(this);
-        blueTextView.setOnClickListener(this);
-        purpleTextView.setOnClickListener(this);
-        whiteTextView.setOnClickListener(this);
-        yellowTextView.setOnClickListener(this);
-        greenTextView.setOnClickListener(this);
-        orangeTextView.setOnClickListener(this);
-        defaultTextView.setOnClickListener(this);
-        greenWallpaperTextView.setOnClickListener(this);
-        brownTextView.setOnClickListener(this);
-        randomTextView.setOnClickListener(this);
-//        addNoteDatabase.clearDatabase();
-//        if (AddNoteModel.bit == 1) {
-//            receiveIntentInformation();
-//        }
     }
 
     @Override
@@ -96,9 +73,12 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
         itemFavorite = menu.add(Menu.NONE, idFavorite, 3, "Favorite");
         itemLock = menu.add(Menu.NONE, idLock, 4, "Lock");
         itemSecret = menu.add(Menu.NONE, idSecret, 5, "Secret");
+        itemColor = menu.add(Menu.NONE, idColor, 6, "Color");
 
+        itemColor.setIcon(R.drawable.ic_color_lens);
         itemSave.setIcon(R.drawable.ic_save_black_24dp);
         itemDelete.setIcon(R.drawable.ic_delete_black_24dp);
+        itemColor.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         itemSave.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         itemDelete.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         itemFavorite.setCheckable(true);
@@ -134,35 +114,75 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
                 itemFavorite.setCheckable(true);
                 if (model.getFavourite() == 0) {
                     model.setFavourite(1);
+                    itemSecret.setEnabled(false);
                     itemFavorite.setChecked(true);
                 } else {
                     model.setFavourite(0);
                     itemFavorite.setChecked(false);
+                    if (model.getLock() == 0)
+                        itemSecret.setEnabled(true);
                 }
+                Log.e("checked ", " favourite " + model.getFavourite() + " lock " + model.getLock());
                 break;
             case 4:
-                itemLock.setCheckable(true);
-                if (model.getLock() == 0) {
-                    model.setLock(1);
-                    itemLock.setChecked(true);
-//                    Log.e("locked", "" + model.getLock());
-                } else {
-                    model.setLock(0);
-                    itemLock.setChecked(false);
-//                    Log.e("locked", "" + model.getLock());
+                    itemLock.setEnabled(true);
+                    itemLock.setCheckable(true);
+                    if (model.getLock() == 0) {
+                        model.setLock(1);
+                        itemLock.setChecked(true);
+                        itemSecret.setEnabled(false);
+                    } else {
+                        model.setLock(0);
+                        itemLock.setChecked(false);
+                        if (model.getFavourite() == 0)
+                            itemSecret.setEnabled(true);
                 }
                 break;
             case 5:
                 itemSecret.setCheckable(true);
                 if (model.getSecret() == 0) {
                     model.setSecret(1);
+                    itemFavorite.setEnabled(false);
+                    itemLock.setEnabled(false);
                     itemSecret.setChecked(true);
                     Log.e("secret", "" + model.getSecret());
                 } else {
                     model.setSecret(0);
+                    itemFavorite.setEnabled(true);
+                    itemLock.setEnabled(true);
                     itemSecret.setChecked(false);
                     Log.e("secret", "" + model.getSecret());
                 }
+                break;
+            case 6:
+                dialog = new Dialog(this);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setContentView(R.layout.colors_dialog);
+
+                pinkTextView = dialog.findViewById(R.id.color_list_pink);
+                yellowTextView = dialog.findViewById(R.id.color_list_yellow);
+                blueTextView = dialog.findViewById(R.id.color_list_blue);
+                whiteTextView = dialog.findViewById(R.id.color_list_white);
+                greenTextView = dialog.findViewById(R.id.color_list_green);
+                purpleTextView = dialog.findViewById(R.id.color_list_purple);
+                orangeTextView = dialog.findViewById(R.id.color_list_orange);
+                defaultTextView = dialog.findViewById(R.id.color_list_default);
+                greenWallpaperTextView = dialog.findViewById(R.id.color_list_greenWallpaper);
+//                brownTextView = dialog.findViewById(R.id.color_list_brown);
+//                randomTextView = dialog.findViewById(R.id.color_list_random);
+
+                pinkTextView.setOnClickListener(this);
+                blueTextView.setOnClickListener(this);
+                purpleTextView.setOnClickListener(this);
+                whiteTextView.setOnClickListener(this);
+                yellowTextView.setOnClickListener(this);
+                greenTextView.setOnClickListener(this);
+                orangeTextView.setOnClickListener(this);
+                defaultTextView.setOnClickListener(this);
+                greenWallpaperTextView.setOnClickListener(this);
+//                brownTextView.setOnClickListener(this);
+//                randomTextView.setOnClickListener(this);
+                dialog.show();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -178,10 +198,12 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onBackPressed() {
-//        super.onBackPressed();
         if (!TextUtils.isEmpty(writeNote.getText().toString())
-                && !TextUtils.isEmpty(titleEditText.getText().toString()))
+                && !TextUtils.isEmpty(titleEditText.getText().toString())) {
             saveNote();
+        }
+        super.onBackPressed();
+
     }
 
     public void lockNoteToNotificationBar() {
@@ -359,11 +381,11 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
                 writeNote.setBackgroundColor(getResources().getColor(R.color.orange));
                 model.setColor("" + R.color.orange);
                 break;
-            case R.id.color_list_brown:
-                writeNote.setBackgroundResource(R.drawable.brown_wallpaper);
-                model.setColor("" + R.drawable.brown_wallpaper);
-                Log.e("brown ", "" + R.drawable.brown_wallpaper);
-                break;
+//            case R.id.color_list_brown:
+//                writeNote.setBackgroundResource(R.drawable.brown_wallpaper);
+//                model.setColor("" + R.drawable.brown_wallpaper);
+//                Log.e("brown ", "" + R.drawable.brown_wallpaper);
+//                break;
             case R.id.color_list_greenWallpaper:
                 writeNote.setBackgroundResource(R.drawable.green_wallpaper);
                 model.setColor("" + R.drawable.green_wallpaper);
@@ -372,11 +394,12 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
                 writeNote.setBackgroundResource(R.drawable.rosewallpaper);
                 model.setColor("" + R.drawable.rosewallpaper);
                 break;
-            case R.id.color_list_random:
-                writeNote.setBackgroundResource(R.drawable.random_wallpaper);
-                model.setColor("" + R.drawable.random_wallpaper);
-                break;
+//            case R.id.color_list_random:
+//                writeNote.setBackgroundResource(R.drawable.random_wallpaper);
+//                model.setColor("" + R.drawable.random_wallpaper);
+//                break;
         }
+        dialog.dismiss();
     }
 
 

@@ -7,13 +7,17 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.etsy.android.grid.StaggeredGridView;
 import com.example.abeer.mysecretportfolio.R;
+import com.example.abeer.mysecretportfolio.plugins.PositiveAdapter;
 
 public class PositiveQuotesActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
-    private RecyclerView recyclerView;
-    private QuotesRecyclerAdapter adapter;
+//    private RecyclerView recyclerView;
+        private StaggeredGridView gridView;
+        private PositiveAdapter adapter;
+//    private QuotesRecyclerAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,10 +28,13 @@ public class PositiveQuotesActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); //
 
-        recyclerView = findViewById(R.id.recyclerView_possitive_quotes);
-        adapter = new QuotesRecyclerAdapter();
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
-        recyclerView.setAdapter(adapter);
+         adapter = new PositiveAdapter();
+         gridView = findViewById(R.id.recyclerView_possitive_quotes);
+        gridView.setAdapter(adapter);
+//        recyclerView = findViewById(R.id.recyclerView_possitive_quotes);
+//        adapter = new QuotesRecyclerAdapter();
+//        recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
+//        recyclerView.setAdapter(adapter);
     }
 
     @Override
