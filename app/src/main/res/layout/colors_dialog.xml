@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:columnCount="3"
+    android:rowCount="3">
+
+
+    <TextView
+        android:id="@+id/color_list_yellow"
+        android:background="@drawable/yellow"
+        android:layout_height="120dp"
+        android:layout_width="120dp"
+        />
+
+    <TextView
+        android:id="@+id/color_list_pink"
+        android:background="@color/pink"
+        android:layout_height="120dp"
+        android:layout_width="120dp"
+        />
+
+    <TextView
+        android:id="@+id/color_list_blue"
+        android:background="@color/blue"
+        android:layout_height="120dp"
+        android:layout_width="120dp"
+        />
+
+    <TextView
+        android:id="@+id/color_list_white"
+        android:background="@color/white"
+        android:layout_height="120dp"
+        android:layout_width="120dp"
+        />
+
+    <TextView
+        android:id="@+id/color_list_green"
+        android:background="@color/green"
+        android:layout_height="120dp"
+        android:layout_width="120dp"
+        />
+
+    <TextView
+        android:id="@+id/color_list_purple"
+        android:background="@color/purple"
+        android:layout_height="120dp"
+        android:layout_width="120dp"
+        />
+
+    <TextView
+        android:id="@+id/color_list_default"
+        android:background="@drawable/rosewallpaper"
+        android:layout_height="120dp"
+        android:layout_width="120dp"
+        />
+
+    <TextView
+        android:id="@+id/color_list_greenWallpaper"
+        android:background="@drawable/green_wallpaper"
+        android:layout_height="120dp"
+        android:layout_width="120dp"
+        />
+
+    <TextView
+        android:id="@+id/color_list_orange"
+        android:background="@color/orange"
+        android:layout_height="120dp"
+        android:layout_width="120dp"
+        />
+</GridLayout>
