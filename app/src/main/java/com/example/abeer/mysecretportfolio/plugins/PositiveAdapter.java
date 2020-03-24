@@ -1,57 +1,76 @@
 package com.example.abeer.mysecretportfolio.plugins;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.TextView;
+import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.abeer.mysecretportfolio.R;
-import com.example.abeer.mysecretportfolio.models.PositiveQuoteModel;
-import com.example.abeer.mysecretportfolio.plugins.positivequotes.PositiveQuotesList;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class PositiveAdapter extends BaseAdapter {
+public class PositiveAdapter extends RecyclerView.Adapter<PositiveAdapter.ViewHolderLocal> {
 
 //    private List<PositiveQuoteModel> list;
-    private PositiveQuotesList quotesList = new PositiveQuotesList();
-    private ArrayList<Integer> colorList = quotesList.returnColor();
-    private ArrayList<String> quoteList = quotesList.returnQuotes();
+private Context mContext;
+    private List<Bitmap> bitmapList;
 
-//    public PositiveAdapter(PositiveQuotesList quotesList) {
-//        this.quotesList = quotesList;
-//    }
+    public PositiveAdapter(Context mContext,List<Bitmap> bitmapList){//}Context context, ArrayList<String> names, ArrayList<String> imageUrls) {
+        this.bitmapList = bitmapList;
+        this.mContext = mContext;
 
-    @Override
-    public int getCount() {
-        return quoteList.size();
     }
 
     @Override
-    public Object getItem(int position) {
-        return null;
+    public PositiveAdapter.ViewHolderLocal onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).
+                inflate(R.layout.recycler_row_possitive_quotes, parent, false);
+        return new PositiveAdapter.ViewHolderLocal(view);
     }
 
     @Override
-    public long getItemId(int position) {
-        return 0;
+    public void onBindViewHolder(PositiveAdapter.ViewHolderLocal holder, final int position) {
+
+        RequestOptions requestOptions = new RequestOptions()
+                .placeholder(R.drawable.brown_wallpaper);
+
+        Glide.with(mContext)
+                .load(bitmapList.get(position))
+                .apply(requestOptions)
+                .into(holder.image);
+
+//        holder.name.setText(mNames.get(position));
+
+        holder.image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                Log.d(TAG, "onClick: clicked on: " + mNames.get(position));
+//                Toast.makeText(mContext, mNames.get(position), Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView == null) {
-            convertView = LayoutInflater.from(parent.getContext()).
-                    inflate(R.layout.recycler_row_possitive_quotes, parent, false);
+    public int getItemCount() {
+        return bitmapList.size();
+    }
+
+    public class ViewHolderLocal extends RecyclerView.ViewHolder {
+
+        ImageView image;
+//        TextView name;
+
+
+        public ViewHolderLocal(android.view.View itemView) {
+            super(itemView);
+            this.image = itemView.findViewById(R.id.textView_possitive_quotes);
+//            this.name = itemView.findViewById(R.id.name_widget);
         }
-
-        TextView textView = convertView.findViewById(R.id.textView_possitive_quotes);
-        textView.setText(quoteList.get(position));
-        textView.setBackgroundResource(colorList.get(position));
-
-        return convertView;
     }
-
-
 }

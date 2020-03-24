@@ -4,6 +4,10 @@
     package="com.example.abeer.mysecretportfolio">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
 
     <application
         android:allowBackup="true"
@@ -12,25 +16,30 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".plugins.PluginsGridActivity"></activity>
         <activity
-            android:name=".plugins.favourite.FavouriteActivity"
-            android:label="@string/favourite_list" />
+            android:name=".plugins.PluginsGridActivity"
+            android:screenOrientation="sensorPortrait" />
+
         <activity
-            android:name=".plugins.positivequotes.PositiveQuotesActivity"
-            android:label="@string/positive" />
+            android:name=".plugins.PositiveQuotesActivity"
+            android:label="@string/positive"
+            android:screenOrientation="sensorPortrait" />
         <activity
             android:name=".TestingActivity"
-            android:label="Testing"></activity>
+            android:label="Testing"
+            android:screenOrientation="sensorPortrait"/>
         <activity
             android:name=".plugins.CalenderActivity"
-            android:label="@string/calender" />
+            android:label="@string/calender"
+            android:screenOrientation="sensorPortrait" />
         <activity
             android:name=".AddNoteActivity"
-            android:label="" />
+            android:label=""
+            android:screenOrientation="sensorPortrait" />
         <activity
             android:name=".MainActivity"
-            android:label="@string/portfolio">
+            android:label="@string/portfolio"
+            android:screenOrientation="sensorPortrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -46,7 +55,8 @@
         <activity
             android:name=".SplashAct"
             android:label="My notes"
-            android:noHistory="false"></activity>
+            android:noHistory="false"
+            android:screenOrientation="sensorPortrait" />
     </application>
 
 </manifest>

@@ -5,7 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -19,7 +22,7 @@ import java.util.List;
 public class AddNoteDatabase extends SQLiteOpenHelper {
 
     private static final String NOTE_DB_NAME = "myNoteAppDB";
-    private static final int NOTE_DB_VERSION = 5;
+    private static final int NOTE_DB_VERSION = 7;
 
     private String NOTES_TABLE = "notes_table";
 
@@ -27,6 +30,8 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
     private String NOTES_TITLE = "title";
     private String NOTES_NOTE = "note";
     private String NOTES_COLOR = "color";
+    private String NOTES_FLAG = "flag";// 0 => hand note , 1 => voice note
+
     // **********************************************************
     private String PLUGINS_TABLE = "plugins_table";
 
@@ -46,6 +51,13 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
     private String SECRET_ID = "id";
     private String SECRET_NOTE = "note";
 
+    // **********************************************************
+    private String QUOTE_TABLE = "quote_table";
+
+    private String QUOTE_ID = "id";
+    private String QUOTE_IMAGE = "image";
+
+
 // **********************************************************
 
 
@@ -57,11 +69,18 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
 //        clearDatabase();
 
+        String sqlQuery5 = "CREATE TABLE IF NOT EXISTS " + QUOTE_TABLE + "("
+                + QUOTE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + QUOTE_IMAGE + " BLOB"
+                + ");";
+
         String sqlQuery = "CREATE TABLE IF NOT EXISTS " + NOTES_TABLE + "("
                 + NOTES_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + NOTES_TITLE + " VARCHAR,"
                 + NOTES_NOTE + " VARCHAR,"
-                + NOTES_COLOR + " VARCHAR);";
+                + NOTES_COLOR + " VARCHAR,"
+                + NOTES_FLAG + " INTEGER"
+                + ");";
 
         String sqlQuery2 = "CREATE TABLE IF NOT EXISTS " + PLUGINS_TABLE + "("
                 + PLUGINS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -82,35 +101,44 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
         db.execSQL(sqlQuery2);
         db.execSQL(sqlQuery3);
         db.execSQL(sqlQuery4);
+        db.execSQL(sqlQuery5);
 
 //        db.close();
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("ALTER TABLE " + PASSWORD_TABLE + " ADD COLUMN " + PASSWORD + " VARCHAR");
+        db.execSQL("ALTER TABLE " + NOTES_TABLE + " ADD COLUMN " + NOTES_FLAG + " INTEGER");
+        db.execSQL("UPDATE " + NOTES_TABLE + " SET " + NOTES_FLAG + " = 0");
 //        db.execSQL("ALTER TABLE " + PASSWORD_TABLE + " ADD COLUMN " + PASSWORD + " VARCHAR");
+//        db.execSQL("CREATE TABLE IF NOT EXISTS " + QUOTE_TABLE + "("
+//                + QUOTE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+//                + QUOTE_IMAGE + " BLOB"
+//                + ");");
 
 //        String sqlQuery = "DROP TABLE IF EXISTS " + NOTES_TABLE;
-//        String sqlQuery2 = "DROP TABLE IF EXISTS " + PLUGINS_TABLE;
-        String sqlQuery3 = "DROP TABLE IF EXISTS " + PASSWORD_TABLE;
-//        String sqlQuery4 = "DROP TABLE IF EXISTS " + SECRET_TABLE;
 
 //        db.execSQL(sqlQuery);
-//        db.execSQL(sqlQuery2);
-        db.execSQL(sqlQuery3);
-//        db.execSQL(sqlQuery4);
 
         onCreate(db);
 
     }
 
-    public boolean addContent(String title, String note, String color) {
+    public void addImageQuote(byte[] image) throws SQLiteException {
+        SQLiteDatabase database = getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(QUOTE_IMAGE, image);
+        database.insert(QUOTE_TABLE, null, contentValues);
+    }
+
+    public boolean addContent(String title, String note, String color, int flag) {
         SQLiteDatabase database = getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(NOTES_TITLE, title);
         contentValues.put(NOTES_NOTE, note);
         contentValues.put(NOTES_COLOR, color);
+        contentValues.put(NOTES_FLAG, flag);
+
         database.insert(NOTES_TABLE, null, contentValues);
         return true;
     }
@@ -144,7 +172,7 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
         return true;
     }
 
-    //------------------------------------------------------------------
+    //------------------------------------- UPDATE -----------------------------
 
     public void updateContent(int id, String title, String note, String color) {
         SQLiteDatabase database = this.getWritableDatabase();
@@ -179,7 +207,7 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
         database.update(SECRET_TABLE, contentValues, SECRET_ID + " = ?", new String[]{String.valueOf(id)});
     }
 
-    //--------------------------------- clear ---------------------------------
+    //--------------------------------- CLEAR ---------------------------------
 
     public void clearDatabase() {
         SQLiteDatabase database = this.getWritableDatabase();
@@ -193,11 +221,32 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
 
     }
 
-    //------------------------------------ select ------------------------------
+    public void clearQuote() {
+        SQLiteDatabase database = this.getWritableDatabase();
+        database.delete(QUOTE_TABLE, null, null);
+
+    }
+
+    //------------------------------------ SELECT ------------------------------
+
+
+    public List<Bitmap> getImage() {
+        SQLiteDatabase database = getWritableDatabase();
+        List<Bitmap> bitmapList = new ArrayList<>();
+        String query = "SELECT * FROM " + QUOTE_TABLE;
+        Cursor cursor = database.rawQuery(query, null);
+        if (cursor.moveToFirst())
+            do {
+                byte[] image = cursor.getBlob(1);
+                bitmapList.add(BitmapFactory.decodeByteArray(image, 0, image.length));
+
+            } while (cursor.moveToNext());
+        return bitmapList;
+    }
 
     public List<HomeModel> selectAllContent() {
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT note_id,title,note,color,plugin_rid,favorite,lock,secret FROM notes_table,plugins_table WHERE \n" +
+        String query = "SELECT note_id,title,note,color,plugin_rid,favorite,lock,secret,flag FROM notes_table,plugins_table WHERE \n" +
                 "note_id == plugin_rid AND secret = 0";
         Cursor cursor = db.rawQuery(query, null);
         List<HomeModel> list = new ArrayList<>();
@@ -212,6 +261,7 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
                 model.setFavorite(cursor.getInt(5));
                 model.setPinToTaskbar(cursor.getInt(6));
                 model.setSecret(cursor.getInt(7));
+                model.setNoteFlag(cursor.getInt(8));
 
                 Log.e("secretDB ", "" + model.getSecret());
 

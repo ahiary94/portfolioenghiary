@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+    android:id="@+id/main_coordinator"
     tools:context="com.example.abeer.mysecretportfolio.MainActivity">
 
     <include
@@ -22,7 +23,14 @@
             android:id="@+id/main_relativeLayout_container"
             android:background="@color/lightPink"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/home_recyclerView"
+                android:layout_margin="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </RelativeLayout>
 
         <android.support.design.widget.NavigationView
             android:id="@+id/main_navigation_view"
@@ -36,5 +44,7 @@
             />
 
     </android.support.v4.widget.DrawerLayout>
+
+
 
 </RelativeLayout>

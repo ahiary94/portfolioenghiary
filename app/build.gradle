@@ -40,5 +40,11 @@ dependencies {
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.3'
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
     implementation 'com.etsy.android.grid:library:1.0.5'
+    implementation 'com.squareup.picasso:picasso:2.71828'
+
+
+    //glide
+    implementation 'com.github.bumptech.glide:glide:4.5.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.5.0'
 
 }

@@ -13,6 +13,15 @@ public class HomeModel implements Serializable {
     private int pinToTaskbar;
     private int secret;
     private String secretPasswordDialog;
+    private int noteFlag;
+
+    public int getNoteFlag() {
+        return noteFlag;
+    }
+
+    public void setNoteFlag(int noteFlag) {
+        this.noteFlag = noteFlag;
+    }
 
     public String getSecretPasswordDialog() {
         return secretPasswordDialog;

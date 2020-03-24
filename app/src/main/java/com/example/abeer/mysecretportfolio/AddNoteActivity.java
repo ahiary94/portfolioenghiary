@@ -27,7 +27,7 @@ import com.example.abeer.mysecretportfolio.models.AddNoteModel;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class AddNoteActivity extends AppCompatActivity implements View.OnClickListener, DialogInterface.OnClickListener {
+public class AddNoteActivity extends AppCompatActivity implements View.OnClickListener{
 
     private Toolbar toolbar;
     private LinearLayout coordinatorLayout;
@@ -37,7 +37,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
     private TextView pinkTextView, yellowTextView, blueTextView, whiteTextView, greenTextView, purpleTextView, orangeTextView, defaultTextView, greenWallpaperTextView, brownTextView, randomTextView;
     private AddNoteDatabase addNoteDatabase;
     private AddNoteModel model;
-    private int id = 0;
+    private int id = 0, noteFlag = 0;
     private Dialog dialog;
     private NotificationManager mNotificationManager;
     private threadClassPart threadClassPart;
@@ -57,7 +57,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         addNoteDatabase = new AddNoteDatabase(this);
-        model = new AddNoteModel(0, 0, 0);
+        model = new AddNoteModel(0, 0, 0, 0);
         model.setTitle("No Title");
         model.setNote("Empty...");
         model.setColor("" + R.drawable.rosewallpaper);
@@ -97,20 +97,20 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
             case android.R.id.home:
                 onBackPressed();
                 return true;
-            case 1:
+            case 1: // Save
                 if (writeNote.getText().length() != 0 || titleEditText.getText().length() != 0)
                     saveNote();
                 else
                     Toast.makeText(this, "The note is empty!", Toast.LENGTH_SHORT).show();
                 break;
-            case 2:
+            case 2: // Delete
                 if (AddNoteModel.bit == 1) {
                     deleteTheNote();
                 } else {
                     Toast.makeText(this, "The note doesn't saved yet!", Toast.LENGTH_SHORT).show();
                 }
                 break;
-            case 3:
+            case 3: // Favourite
                 itemFavorite.setCheckable(true);
                 if (model.getFavourite() == 0) {
                     model.setFavourite(1);
@@ -124,7 +124,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
                 }
                 Log.e("checked ", " favourite " + model.getFavourite() + " lock " + model.getLock());
                 break;
-            case 4:
+            case 4: // Lock
                     itemLock.setEnabled(true);
                     itemLock.setCheckable(true);
                     if (model.getLock() == 0) {
@@ -138,7 +138,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
                             itemSecret.setEnabled(true);
                 }
                 break;
-            case 5:
+            case 5: // Secret
                 itemSecret.setCheckable(true);
                 if (model.getSecret() == 0) {
                     model.setSecret(1);
@@ -154,7 +154,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
                     Log.e("secret", "" + model.getSecret());
                 }
                 break;
-            case 6:
+            case 6: // Color background
                 dialog = new Dialog(this);
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setContentView(R.layout.colors_dialog);
@@ -233,10 +233,9 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
         model.setTitle("" + titleEditText.getText());
         if (AddNoteModel.bit == 0) { // new note
 //            Log.e("after adding to db", "" + model.getId());
-            addNoteDatabase.addContent(model.getTitle(), model.getNote(), model.getColor());
+            addNoteDatabase.addContent(model.getTitle(), model.getNote(), model.getColor(), noteFlag);
 //            Log.e("...........", "savePluginsInformation");
-            threadClassPart = new threadClassPart();////////////////
-            threadClassPart.start();///////////////
+            new threadClassPart().start();///////////////
 //            snackbar = Snackbar.make(coordinatorLayout, "Added Successfully", Snackbar.LENGTH_SHORT);
 //            snackbar.show();
             Toast.makeText(this, "Added Successfully", Toast.LENGTH_SHORT).show();
@@ -291,28 +290,25 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Are You Want Delete it?");
         builder.setIcon(R.drawable.ic_delete_black_24dp);
-        builder.setPositiveButton("Ok", this);
-        builder.setNeutralButton("Cancel", this);
-        builder.show();
-
-    }
-
-    @Override
-    public void onClick(DialogInterface dialog, int which) {
-        switch (which) {
-            case DialogInterface.BUTTON_POSITIVE: {
-                Toast.makeText(this, "The note is deleted", Toast.LENGTH_SHORT).show();
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(AddNoteActivity.this, "The note is deleted", Toast.LENGTH_SHORT).show();
                 addNoteDatabase.clearNote(id);
                 AddNoteModel.bit = 0;
                 Intent goToHome = new Intent(AddNoteActivity.this, MainActivity.class);
                 startActivity(goToHome);
                 finish();
-                break;
             }
-            case DialogInterface.BUTTON_NEUTRAL: {
+        });
+        builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
+
             }
-        }
+        });
+        builder.show();
 
     }
 

@@ -2,11 +2,16 @@ package com.example.abeer.mysecretportfolio;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
+import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Build;
@@ -15,6 +20,7 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -23,38 +29,42 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.TextureView;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.abeer.mysecretportfolio.models.AddNoteModel;
-import com.example.abeer.mysecretportfolio.home.HomePageFragment;
+import com.example.abeer.mysecretportfolio.models.HomeModel;
 import com.example.abeer.mysecretportfolio.plugins.CalenderActivity;
 import com.example.abeer.mysecretportfolio.plugins.PluginsGridActivity;
-import com.example.abeer.mysecretportfolio.plugins.positivequotes.PositiveQuotesActivity;
+import com.example.abeer.mysecretportfolio.plugins.PositiveQuotesActivity;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Date;
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static android.media.MediaRecorder.AudioSource.MIC;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, DialogInterface.OnClickListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
+    private Activity activity;
+    private Snackbar snackbar;
+    private RelativeLayout coordinator;
     private ProgressDialog pd;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
@@ -62,19 +72,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ActionBarDrawerToggle toggle;
     private FragmentManager manager;
     private FragmentTransaction transaction;
-    private HomePageFragment homePageFragment;
+    //    private HomePageFragment homePageFragment;
     private AddNoteDatabase database;
     private MediaRecorder mediaRecorder;
     private MediaPlayer mediaPlayer;
     private String fileName = "";
-    private int randomNo;
-    private Button recordVoice, playRecord, pauseRecord, deleteRecord, saveRecord, closeDialog, okSecretPassword;
-    private EditText secretPassword;
+    private int randomNo, noteFlag = 1;
+    private Button deleteRecord, closeDialog, okSecretPassword;
+    private EditText secretPassword, recordTitle;
     private TextView passwordDialogTitle;
     private boolean isStartRecording = false;
     //    private static final int THREAD_ID = 10000;
     private static final int REQUEST_PERMISSION_CODE = 10000;
     private Dialog voiceDialog;
+    private int length =0;
+    private ImageView recordVoice, pauseRecord, playRecord, saveRecord;
+    private RecyclerView recyclerView;
+    private HomeRecyclerAdapter adapter;
+    private List<HomeModel> list = new ArrayList<>();
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -83,10 +98,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
 
 //        TrafficStats.setThreadStatsTag(THREAD_ID);
+        activity = this;
+        database = new AddNoteDatabase(this);
+        coordinator = findViewById(R.id.main_coordinator);
         toolbar = findViewById(R.id.general_toolbar);
         drawerLayout = findViewById(R.id.main_drawer_layout);
         navigationView = findViewById(R.id.main_navigation_view);
-        database = new AddNoteDatabase(this);
+        recyclerView = findViewById(R.id.home_recyclerView);
 
         setSupportActionBar(toolbar);
         toggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close);
@@ -96,12 +114,70 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.bringToFront();
         navigationView.setNavigationItemSelectedListener(this);
 
-        getHomePage();
+//        getHomePage();
+        getRecyclerItems();
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+        adapter = new HomeRecyclerAdapter(list, this, database);
+        recyclerView.setAdapter(adapter);
 
         pd = new ProgressDialog(this);
         pd.setMessage("Please waiting...");
         pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 
+    }
+
+    public void getRecyclerItems() {
+        list.clear();
+        list = database.selectAllContent();
+        Log.e("size from db", "" + list.size());
+//        if (cursor.moveToFirst()) {
+//            do {
+//                HomeModel model = new HomeModel();
+//                model.setId(cursor.getInt(0));
+//                model.setTitle(cursor.getString(1));
+//                model.setNote(cursor.getString(2));
+//                model.setColor(Integer.parseInt(cursor.getString(3)));
+//                model.setPluginId(cursor.getInt(4));
+//                model.setFavorite(cursor.getInt(5));
+//                model.setPinToTaskbar(cursor.getInt(6));
+//
+//                Log.e("id " ,"" + model.getId());
+//                Log.e("fav " ,"" + model.getFavorite());
+//
+//                list.add(model);
+//            } while (cursor.moveToNext());
+//        }
+//        cursor.close();
+    }
+
+    public void goToAddNotePageForEditting(HomeModel model) {
+        Intent intent = new Intent(this, AddNoteActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("model", model);
+        intent.putExtras(bundle);
+        AddNoteModel.bit = 1;
+//        Log.e("id editing", "" + model.getId());
+//        Log.e("pluginid editing", "" + model.getPluginId());
+//        Log.e("favorite editing", "" + model.getFavorite());
+        startActivity(intent);
+
+    }
+
+    public class threadClassPart extends Thread {
+        public void run() {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                    Cursor cursor = database.selectTheLastRow();
+                    cursor.moveToFirst();
+                    int noteID = cursor.getInt(0);
+                    Log.e("returned id", "" + noteID);
+                    cursor.close();
+                    database.addPluginsContent(noteID, 0, 0, 0);
+                }
+            });
+        }
     }
 
     private void requestPermission() {
@@ -139,13 +215,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    void getHomePage() {
-        manager = getSupportFragmentManager();
-        homePageFragment = new HomePageFragment();
-        transaction = manager.beginTransaction();
-        transaction.add(R.id.main_relativeLayout_container, homePageFragment);
-        transaction.commit();
-    }
+//    void getHomePage() {
+//        manager = getSupportFragmentManager();
+//        homePageFragment = new HomePageFragment();
+//        transaction = manager.beginTransaction();
+//        transaction.add(R.id.main_relativeLayout_container, homePageFragment);
+//        transaction.commit();
+//    }
 
     @SuppressLint("ClickableViewAccessibility")
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -167,8 +243,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             playRecord = voiceDialog.findViewById(R.id.voiceMessage_play);
             pauseRecord = voiceDialog.findViewById(R.id.voiceMessage_pause);
             saveRecord = voiceDialog.findViewById(R.id.voiceMessage_save);
-            deleteRecord = voiceDialog.findViewById(R.id.voiceMessage_delete);
             closeDialog = voiceDialog.findViewById(R.id.voiceMessage_close);
+            recordTitle = voiceDialog.findViewById(R.id.voiceMessage_title);
+
+            playRecord.setEnabled(false);
+            playRecord.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.gray2f)));
+            pauseRecord.setEnabled(false);
+            pauseRecord.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.gray2f)));
+            saveRecord.setEnabled(false);
+            saveRecord.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.gray2f)));
 
             recordVoice.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -176,12 +259,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if (checkDevicePermission()) {
 
                         if (!isStartRecording) {
-                            recordVoice.setBackgroundResource(R.drawable.record_start);
+                            recordVoice.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.red_dark)));
                             isStartRecording = true;
-                            playRecord.setEnabled(false);
-                            pauseRecord.setEnabled(false);
-                            saveRecord.setEnabled(false);
-                            deleteRecord.setEnabled(false);
+
 //                            Date date = new Date();
                             fileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + UUID.randomUUID().toString() + "record.3gp";
                             Log.e("fileName", fileName);
@@ -194,101 +274,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             }
 
                             Toast.makeText(MainActivity.this, "Recording...", Toast.LENGTH_SHORT).show();
-//                            randomNo = new Random().nextInt(1000);
-//                            fileName += "/noterecord" + randomNo + ".3gp";
-//                            mediaRecorder = new MediaRecorder();
-//                            try {
-//                                mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);  //ok so I say audio source is the microphone, is it windows/linux microphone on the emulator?
-//                            }catch (Exception e){
-//                                Log.e("Exception", e.getMessage().toString());
-//                            }
-//                            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-//                            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-//                            mediaRecorder.setOutputFile("/sdcard/Music/"+System.currentTimeMillis()+".amr");
-//
-//
-//                            if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-//
-//                                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.RECORD_AUDIO},
-//                                        0);
-//                                Toast.makeText(MainActivity.this, "not granted", Toast.LENGTH_SHORT).show();
-//                            } else {
-//                                mediaRecorder.start();
-//                            }
                         } else {
                             isStartRecording = false;
                             playRecord.setEnabled(true);
+                            playRecord.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.white)));
                             pauseRecord.setEnabled(true);
+                            pauseRecord.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.white)));
                             saveRecord.setEnabled(true);
-                            deleteRecord.setEnabled(true);
-                            recordVoice.setBackgroundResource(R.drawable.record);
+                            saveRecord.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.white)));
+                            recordVoice.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.white)));
                             mediaRecorder.stop();
                             Toast.makeText(MainActivity.this, "Recording stopped", Toast.LENGTH_SHORT).show();
                         }
-
                     } else {
                         requestPermission();
                     }
                 }
             });
-//            recordVoice.setOnTouchListener(new View.OnTouchListener() {
-//                @Override
-//                public boolean onTouch(View view, MotionEvent motionEvent) {
-//                    if (checkDevicePermission()) {
-//                        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-//
-//                            recordVoice.setBackgroundResource(R.drawable.record_start);
-//                            fileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + UUID.randomUUID().toString() + "record.3gp";
-//                            setUpMediaRecorder();
-//                            try {
-//                                mediaRecorder.prepare();
-//                                mediaRecorder.start();
-//                            } catch (IOException e) {
-//                                e.printStackTrace();
-//                            }
-//
-//                            Toast.makeText(MainActivity.this, "Recording...", Toast.LENGTH_SHORT).show();
-////                            randomNo = new Random().nextInt(1000);
-////                            fileName += "/noterecord" + randomNo + ".3gp";
-////                            mediaRecorder = new MediaRecorder();
-////                            try {
-////                                mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);  //ok so I say audio source is the microphone, is it windows/linux microphone on the emulator?
-////                            }catch (Exception e){
-////                                Log.e("Exception", e.getMessage().toString());
-////                            }
-////                            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-////                            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-////                            mediaRecorder.setOutputFile("/sdcard/Music/"+System.currentTimeMillis()+".amr");
-////
-////
-////                            if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-////
-////                                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.RECORD_AUDIO},
-////                                        0);
-////                                Toast.makeText(MainActivity.this, "not granted", Toast.LENGTH_SHORT).show();
-////                            } else {
-////                                mediaRecorder.start();
-////                            }
-//
-//                        } else {
-//
-////                            recordVoice.setBackgroundResource(R.drawable.record);
-////                            fileName = Environment.getExternalStorageDirectory().getAbsolutePath();
-////                            randomNo = new Random().nextInt(1000);
-////                            fileName += "/noterecord" + randomNo + ".3gp";
-////                            mediaRecorder.setOutputFile(fileName);
-//                            mediaRecorder.stop();
-//                        }
-//                    } else {
-//                        requestPermission();
-//                    }
-//                    return false;
-//                }
-//            });
-
             playRecord.setOnClickListener(new VoiceDialogActions());
             pauseRecord.setOnClickListener(new VoiceDialogActions());
             closeDialog.setOnClickListener(new VoiceDialogActions());
+            saveRecord.setOnClickListener(new VoiceDialogActions());
 
             voiceDialog.show();
         }
@@ -301,32 +307,52 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             switch (view.getId()) {
 
                 case R.id.voiceMessage_play:
-                    mediaPlayer = new MediaPlayer();
-                    try {
-                        mediaPlayer.setDataSource(fileName);
-                        mediaPlayer.prepare();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    if (mediaPlayer != null && length>0) {
+                        mediaPlayer.start();
+                        mediaPlayer.seekTo(length);
                     }
-                    mediaPlayer.start();
-                    Toast.makeText(MainActivity.this, "Started", Toast.LENGTH_SHORT).show();
+//                    Boolean isPaused = !mediaPlayer.isPlaying() && mediaPlayer.getCurrentPosition() > 1;
+//                    if (isPaused)
+//                        mediaPlayer.start();
+                    else {
+                        mediaPlayer = new MediaPlayer();
+                        try {
+                            mediaPlayer.setDataSource(fileName);
+                            mediaPlayer.prepare();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        mediaPlayer.start();
+                        Toast.makeText(MainActivity.this, "Started", Toast.LENGTH_SHORT).show();
+                    }
                     break;
                 case R.id.voiceMessage_pause:
                     if (mediaPlayer != null) {
-                        mediaPlayer.stop();
+                        length = mediaPlayer.getCurrentPosition();
+                        mediaPlayer.pause();
                         mediaPlayer.release();
                     }
                     setUpMediaRecorder();
                     Toast.makeText(MainActivity.this, "Stopped", Toast.LENGTH_SHORT).show();
                     break;
                 case R.id.voiceMessage_save:
+                    String title = "";
+                    title = recordTitle.getText().toString();
+                    if (!TextUtils.isEmpty(fileName)) {
+                        database.addContent(title, fileName, "2131165356", noteFlag);
+                        new threadClassPart().start();
+                        Toast.makeText(MainActivity.this, "Saved successfully", Toast.LENGTH_SHORT).show();
+                        voiceDialog.dismiss();
+                        notifyAdapter();
 
-                    break;
-                case R.id.voiceMessage_delete:
+                    } else
+                        Toast.makeText(MainActivity.this, "File is empty!", Toast.LENGTH_SHORT).show();
                     break;
                 case R.id.voiceMessage_close:
                     if (isStartRecording)
                         mediaRecorder.stop();
+                    fileName = "";
+                    mediaPlayer = null;
                     isStartRecording = false;
                     recordVoice.setBackgroundResource(R.drawable.record);
                     voiceDialog.dismiss();
@@ -334,6 +360,46 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
 
         }
+    }
+
+    void showSnackbar(String message, int drawable) {
+
+        snackbar = Snackbar.make(coordinator, Html.fromHtml("<font color=\"#281CF5\">" + message + "</font>"), Snackbar.LENGTH_SHORT);
+        View snackbarLayout = snackbar.getView();
+        TextView textView = snackbarLayout.findViewById(android.support.design.R.id.snackbar_text);
+        textView.setCompoundDrawablesWithIntrinsicBounds(drawable, 0, 0, 0);
+//        textView.setCompoundDrawablePadding(getResources().getDimensionPixelOffset(R.dimen.snackbar_icon_padding));
+        snackbar.show();
+
+    }
+
+    public void notifyAdapter(){
+        getRecyclerItems();
+        adapter = new HomeRecyclerAdapter(list, this, database);
+        recyclerView.setAdapter(adapter);
+    }
+
+    public void deleteTheNote(final int id) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Are You Want Delete it?");
+        builder.setIcon(R.drawable.ic_delete_black_24dp);
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(MainActivity.this, "The note is deleted", Toast.LENGTH_SHORT).show();
+                database.clearNote(id);
+               notifyAdapter();
+            }
+        });
+        builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+
+            }
+        });
+        builder.show();
+
     }
 
     private void setUpMediaRecorder() {
@@ -357,8 +423,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage("Are You Want to Delete All Notes?");
                 builder.setIcon(R.drawable.ic_delete_black_24dp);
-                builder.setPositiveButton("Ok", this);
-                builder.setNeutralButton("Cancel", this);
+                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        database.clearDatabase();
+                        AddNoteModel.bit = 0;
+                        showSnackbar("Deleted Successfully",R.drawable.ic_check);
+//                finish();
+                        startActivity(getIntent());
+                    }
+                });
+                builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
                 builder.show();
                 break;
             case R.id.plugins_secret:
@@ -426,29 +506,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         System.exit(0);
                     }
                 });
-                builder1.setNeutralButton("Cancel", this);
+                builder1.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
                 builder1.show();
 
         }
         return true;
     }
 
-    @Override
-    public void onClick(DialogInterface dialog, int which) {
-        switch (which) {
-            case DialogInterface.BUTTON_POSITIVE: {
-                Toast.makeText(this, "The note is deleted", Toast.LENGTH_SHORT).show();
-                database.clearDatabase();
-                AddNoteModel.bit = 0;
-//                finish();
-                startActivity(getIntent());
-                break;
-            }
-            case DialogInterface.BUTTON_NEUTRAL: {
-                dialog.cancel();
-            }
-        }
-    }
 //        FragmentManager manager = getFragmentManager();
 //        FragmentTransaction transaction = manager.beginTransaction();
 

@@ -14,14 +14,24 @@ public class AddNoteModel {
     private int lock;
     private int secret;
     private int favourite;
+    private int flag;// 0 => hand written, 1 => voice
 
     public AddNoteModel() {
     }
 
-    public AddNoteModel(int lock, int secret, int favourite) {
+    public AddNoteModel(int lock, int secret, int favourite, int flag) {
         this.lock = lock;
         this.secret = secret;
         this.favourite = favourite;
+        this.flag = flag;
+    }
+
+    public int getFlag() {
+        return flag;
+    }
+
+    public void setFlag(int flag) {
+        this.flag = flag;
     }
 
     public int getPluginsID() {
