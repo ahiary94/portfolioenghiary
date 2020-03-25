@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
@@ -17,7 +18,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.abeer.mysecretportfolio.models.HomeModel;
 
@@ -33,11 +36,16 @@ public class HomeRecyclerAdapter extends RecyclerView.Adapter<HomeRecyclerAdapte
     private MainActivity mainActivity;
     private MediaPlayer mediaPlayer;
     private MediaRecorder mediaRecorder;
+    private int length = 0;
+    private Runnable runnable;
+    private Handler handler;
 
     public HomeRecyclerAdapter(List<HomeModel> list, MainActivity mainActivity, AddNoteDatabase addNoteDatabase) {
         this.list = list;
         this.mainActivity = mainActivity;
         this.addNoteDatabase = addNoteDatabase;
+//        mediaPlayer = new MediaPlayer();
+
     }
 
     @NonNull
@@ -80,6 +88,7 @@ public class HomeRecyclerAdapter extends RecyclerView.Adapter<HomeRecyclerAdapte
             });
         } else if (list.get(position).getNoteFlag() == 1) {
             mediaPlayer = new MediaPlayer();
+            handler = new Handler();
             holder.noteLayout.setVisibility(View.GONE);
             holder.voiceLayout.setVisibility(View.VISIBLE);
             holder.voiceTitle.setText(list.get(position).getTitle());
@@ -87,14 +96,48 @@ public class HomeRecyclerAdapter extends RecyclerView.Adapter<HomeRecyclerAdapte
                 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                 @Override
                 public void onClick(View v) {
+//                    holder.play.setBackgroundTintList(ColorStateList.valueOf(mainActivity.getResources().getColor(R.color.red_dark)));
+                    if (mediaPlayer != null)
+                        mediaPlayer.stop();
+                    mediaPlayer = new MediaPlayer();
                     try {
-                        holder.play.setBackgroundTintList(ColorStateList.valueOf(mainActivity.getResources().getColor(R.color.red_dark)));
                         mediaPlayer.setDataSource(list.get(position).getNote());
                         mediaPlayer.prepare();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                     mediaPlayer.start();
+//                    }
+
+                    mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                        @Override
+                        public void onPrepared(MediaPlayer mp) {
+                            holder.seekBar.setMax(mediaPlayer.getDuration());
+                            mediaPlayer.start();
+                            mainActivity.changeAdapterSeekbar(holder.seekBar, mediaPlayer, runnable, handler);
+
+                        }
+                    });
+//
+                    holder.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                        @Override
+                        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                            if (fromUser) {
+                                mediaPlayer.seekTo(progress);
+                            }
+                        }
+
+                        @Override
+                        public void onStartTrackingTouch(SeekBar seekBar) {
+
+                        }
+
+                        @Override
+                        public void onStopTrackingTouch(SeekBar seekBar) {
+
+                        }
+                    });
+
                 }
             });
 
@@ -102,15 +145,9 @@ public class HomeRecyclerAdapter extends RecyclerView.Adapter<HomeRecyclerAdapte
                 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                 @Override
                 public void onClick(View v) {
+//                    holder.play.setBackgroundTintList(ColorStateList.valueOf(mainActivity.getResources().getColor(R.color.white)));
                     if (mediaPlayer != null) {
-                        holder.play.setBackgroundTintList(ColorStateList.valueOf(mainActivity.getResources().getColor(R.color.white)));
                         mediaPlayer.stop();
-                        mediaPlayer.release();
-//                        mediaRecorder = new MediaRecorder();
-//                        mediaRecorder.setAudioSource(MIC);
-//                        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-//                        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-//                        mediaRecorder.setOutputFile(list.get(position).getNote());
                     }
                 }
             });
@@ -140,6 +177,7 @@ public class HomeRecyclerAdapter extends RecyclerView.Adapter<HomeRecyclerAdapte
         LinearLayout voiceLayout;
         Button play, pause, delete;
         TextView voiceTitle;
+        SeekBar seekBar;
 
         public HomeViewHolder(View itemView) {
             super(itemView);
@@ -149,7 +187,7 @@ public class HomeRecyclerAdapter extends RecyclerView.Adapter<HomeRecyclerAdapte
             title = itemView.findViewById(R.id.textView_favorite_title);
 
             voiceLayout = itemView.findViewById(R.id.home_container_voice);
-//            close = itemView.findViewById(R.id.home_voiceMessage_close);
+            seekBar = itemView.findViewById(R.id.home_voiceMessage_seekbar);
             play = itemView.findViewById(R.id.home_voiceMessage_play);
             pause = itemView.findViewById(R.id.home_voiceMessage_pause);
             delete = itemView.findViewById(R.id.home_voiceMessage_delete);

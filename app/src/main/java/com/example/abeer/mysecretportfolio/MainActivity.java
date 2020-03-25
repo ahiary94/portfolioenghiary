@@ -10,13 +10,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
@@ -44,6 +43,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,7 +60,7 @@ import java.util.UUID;
 
 import static android.media.MediaRecorder.AudioSource.MIC;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private Activity activity;
     private Snackbar snackbar;
@@ -85,11 +85,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     //    private static final int THREAD_ID = 10000;
     private static final int REQUEST_PERMISSION_CODE = 10000;
     private Dialog voiceDialog;
-    private int length =0;
+    private int length = 0;
     private ImageView recordVoice, pauseRecord, playRecord, saveRecord;
     private RecyclerView recyclerView;
     private HomeRecyclerAdapter adapter;
     private List<HomeModel> list = new ArrayList<>();
+    private SeekBar seekBar;
+    private Runnable runnable;
+    private Handler handler;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -130,24 +133,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         list.clear();
         list = database.selectAllContent();
         Log.e("size from db", "" + list.size());
-//        if (cursor.moveToFirst()) {
-//            do {
-//                HomeModel model = new HomeModel();
-//                model.setId(cursor.getInt(0));
-//                model.setTitle(cursor.getString(1));
-//                model.setNote(cursor.getString(2));
-//                model.setColor(Integer.parseInt(cursor.getString(3)));
-//                model.setPluginId(cursor.getInt(4));
-//                model.setFavorite(cursor.getInt(5));
-//                model.setPinToTaskbar(cursor.getInt(6));
-//
-//                Log.e("id " ,"" + model.getId());
-//                Log.e("fav " ,"" + model.getFavorite());
-//
-//                list.add(model);
-//            } while (cursor.moveToNext());
-//        }
-//        cursor.close();
     }
 
     public void goToAddNotePageForEditting(HomeModel model) {
@@ -175,6 +160,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     Log.e("returned id", "" + noteID);
                     cursor.close();
                     database.addPluginsContent(noteID, 0, 0, 0);
+                    notifyAdapter();
+
                 }
             });
         }
@@ -215,14 +202,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-//    void getHomePage() {
-//        manager = getSupportFragmentManager();
-//        homePageFragment = new HomePageFragment();
-//        transaction = manager.beginTransaction();
-//        transaction.add(R.id.main_relativeLayout_container, homePageFragment);
-//        transaction.commit();
-//    }
-
     @SuppressLint("ClickableViewAccessibility")
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -245,6 +224,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             saveRecord = voiceDialog.findViewById(R.id.voiceMessage_save);
             closeDialog = voiceDialog.findViewById(R.id.voiceMessage_close);
             recordTitle = voiceDialog.findViewById(R.id.voiceMessage_title);
+            seekBar = voiceDialog.findViewById(R.id.voiceMessage_seekbar);
+            handler = new Handler();
+            mediaPlayer = new MediaPlayer();
 
             playRecord.setEnabled(false);
             playRecord.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.gray2f)));
@@ -291,6 +273,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 }
             });
+
             playRecord.setOnClickListener(new VoiceDialogActions());
             pauseRecord.setOnClickListener(new VoiceDialogActions());
             closeDialog.setOnClickListener(new VoiceDialogActions());
@@ -306,15 +289,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         public void onClick(View view) {
             switch (view.getId()) {
 
-                case R.id.voiceMessage_play:
-                    if (mediaPlayer != null && length>0) {
-                        mediaPlayer.start();
+                case R.id.voiceMessage_play:{
+                    if (mediaPlayer != null && length > 0) {
                         mediaPlayer.seekTo(length);
-                    }
-//                    Boolean isPaused = !mediaPlayer.isPlaying() && mediaPlayer.getCurrentPosition() > 1;
-//                    if (isPaused)
-//                        mediaPlayer.start();
-                    else {
+                        seekBar.setMax(mediaPlayer.getDuration());
+                        mediaPlayer.start();
+                        changeSeekbar();
+                    } else {
                         mediaPlayer = new MediaPlayer();
                         try {
                             mediaPlayer.setDataSource(fileName);
@@ -325,15 +306,52 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         mediaPlayer.start();
                         Toast.makeText(MainActivity.this, "Started", Toast.LENGTH_SHORT).show();
                     }
+
+                    mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                        @Override
+                        public void onPrepared(MediaPlayer mp) {
+                            seekBar.setMax(mediaPlayer.getDuration());
+                            mediaPlayer.start();
+                            changeSeekbar();
+                        }
+                    });
+//
+                    seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                        @Override
+                        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                            if (fromUser) {
+                                mediaPlayer.seekTo(progress);
+                            }
+                        }
+
+                        @Override
+                        public void onStartTrackingTouch(SeekBar seekBar) {
+
+                        }
+
+                        @Override
+                        public void onStopTrackingTouch(SeekBar seekBar) {
+
+                        }
+                    });
+
+                    mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mp) {
+                            length = 0;
+                            mediaPlayer.seekTo(length);
+                            changeSeekbar();
+                        }
+                    });}
                     break;
                 case R.id.voiceMessage_pause:
                     if (mediaPlayer != null) {
                         length = mediaPlayer.getCurrentPosition();
                         mediaPlayer.pause();
-                        mediaPlayer.release();
+//                        mediaPlayer.release();
                     }
-                    setUpMediaRecorder();
-                    Toast.makeText(MainActivity.this, "Stopped", Toast.LENGTH_SHORT).show();
+//                    setUpMediaRecorder();
+                    Toast.makeText(MainActivity.this, "Paused", Toast.LENGTH_SHORT).show();
                     break;
                 case R.id.voiceMessage_save:
                     String title = "";
@@ -343,7 +361,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         new threadClassPart().start();
                         Toast.makeText(MainActivity.this, "Saved successfully", Toast.LENGTH_SHORT).show();
                         voiceDialog.dismiss();
-                        notifyAdapter();
+//                        notifyAdapter();
 
                     } else
                         Toast.makeText(MainActivity.this, "File is empty!", Toast.LENGTH_SHORT).show();
@@ -362,18 +380,47 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    private void changeSeekbar() {
+        seekBar.setProgress(mediaPlayer.getCurrentPosition());
+        if (mediaPlayer.isPlaying()) {
+            runnable = new Runnable() {
+                @Override
+                public void run() {
+                    changeSeekbar();
+                }
+            };
+            handler.postDelayed(runnable, 500);
+        }
+    }
+
+    public void changeAdapterSeekbar(final SeekBar seekBar, final MediaPlayer mediaPlayer, Runnable runnable, final Handler handler) {
+        seekBar.setProgress(mediaPlayer.getCurrentPosition());
+        if (mediaPlayer.isPlaying()) {
+            final Runnable finalRunnable = runnable;
+            runnable = new Runnable() {
+                @Override
+                public void run() {
+                    changeAdapterSeekbar(seekBar, mediaPlayer, finalRunnable, handler);
+                }
+            };
+            handler.postDelayed(runnable, 500);
+        }
+    }
+
     void showSnackbar(String message, int drawable) {
 
-        snackbar = Snackbar.make(coordinator, Html.fromHtml("<font color=\"#281CF5\">" + message + "</font>"), Snackbar.LENGTH_SHORT);
+        snackbar = Snackbar.make(coordinator, Html.fromHtml("<font color=\"#5951EE\">" + message + "</font>"), Snackbar.LENGTH_SHORT);
         View snackbarLayout = snackbar.getView();
         TextView textView = snackbarLayout.findViewById(android.support.design.R.id.snackbar_text);
         textView.setCompoundDrawablesWithIntrinsicBounds(drawable, 0, 0, 0);
+        textView.setCompoundDrawablePadding(15);
 //        textView.setCompoundDrawablePadding(getResources().getDimensionPixelOffset(R.dimen.snackbar_icon_padding));
         snackbar.show();
 
     }
 
-    public void notifyAdapter(){
+    public void notifyAdapter() {
+        Log.e("notifyAdapter", "true");
         getRecyclerItems();
         adapter = new HomeRecyclerAdapter(list, this, database);
         recyclerView.setAdapter(adapter);
@@ -388,7 +435,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onClick(DialogInterface dialog, int which) {
                 Toast.makeText(MainActivity.this, "The note is deleted", Toast.LENGTH_SHORT).show();
                 database.clearNote(id);
-               notifyAdapter();
+                notifyAdapter();
             }
         });
         builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
@@ -420,26 +467,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivity(calenderIntent);
                 break;
             case R.id.plugins_delete:
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage("Are You Want to Delete All Notes?");
-                builder.setIcon(R.drawable.ic_delete_black_24dp);
-                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        database.clearDatabase();
-                        AddNoteModel.bit = 0;
-                        showSnackbar("Deleted Successfully",R.drawable.ic_check);
-//                finish();
-                        startActivity(getIntent());
-                    }
-                });
-                builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                builder.show();
+                if (recyclerView.getChildCount() > 0) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage("Are You Want Delete All Notes?");
+                    builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            database.clearDatabase();
+                            showSnackbar("Deleted Successfully", R.drawable.ic_check);
+                            notifyAdapter();
+                        }
+                    });
+                    builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    builder.show();
+                } else
+                    Toast.makeText(activity, "The list is empty!", Toast.LENGTH_SHORT).show();
+
                 break;
             case R.id.plugins_secret:
                 final String password = database.getSecretDialogPassword();
@@ -517,135 +565,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         return true;
     }
-
-//        FragmentManager manager = getFragmentManager();
-//        FragmentTransaction transaction = manager.beginTransaction();
-
-//        if (item.getItemId() == R.id.plugins_background) //1
-//        {
-//
-//            //openDialog(false);
-//        }
-///////////////////////////////////////////////////////////////////////////////////
-//        if (item.getItemId() == R.id.plugins_delete)//2
-//        {
-//            // deleteFrag DF=new deleteFrag();
-//            //transaction.replace(R.id.tex_container,DF);
-//            //transaction.commit();
-//            AlertDialog.Builder alertB = new AlertDialog.Builder(this)
-//                    .setIcon(R.drawable.trash)
-//                    .setTitle("My Portofolio ")
-//                    .setMessage("Are you want delete ?");
-//
-//            alertB.setPositiveButton("yes", new DialogInterface.OnClickListener() {
-//                @Override
-//                public void onClick(DialogInterface dialogInterface, int i) {
-//
-//                    portfolioDB pdb = new portfolioDB(MainActivity.this);
-//                    SQLiteDatabase db = pdb.getWritableDatabase();
-//                    //   db.execSQL("update userNotes set note=?",new String[]{""});
-//
-//                }
-//            });
-//
-//            alertB.setNegativeButton("No", new DialogInterface.OnClickListener() {
-//                @Override
-//                public void onClick(DialogInterface dialog, int i) {
-//
-//                    dialog.cancel();
-//
-//                }
-//            });
-//
-//            alertB.setCancelable(true);
-//            AlertDialog dialog = alertB.create();
-//            dialog.show();
-//        }
-//////////////////////////////////////////////////////////////////////////////////////////
-//        if (item.getItemId() == R.id.plugins_exit)//3
-//        {
-//            AlertDialog.Builder alertB = new AlertDialog.Builder(this)
-//                    .setIcon(R.drawable.exit)
-//                    .setTitle("My Portfolio")
-//                    .setMessage("Are you want to exit ?");
-//
-//            alertB.setPositiveButton("yes", new DialogInterface.OnClickListener() {
-//                @Override
-//                public void onClick(DialogInterface dialogInterface, int i) {
-//                    users_account.usersAccount = "";
-//                    finish();
-//                }
-//            });
-//
-//            alertB.setNegativeButton("No", new DialogInterface.OnClickListener() {
-//                @Override
-//                public void onClick(DialogInterface dialog, int i) {
-//
-//                    dialog.cancel();
-//
-//                }
-//            });
-//
-//            alertB.setCancelable(false);
-//            AlertDialog alertDialog = alertB.create();
-//            alertDialog.show();
-//
-//        }
-//////////////////////////////////////////////////////////////////////////////////////////
-//        if (item.getItemId() == R.id.plugins_save)// 4
-//        {
-//            String url1 = "https://mynovelsbox.000webhostapp.com/connect/myPortfolioSave.php";
-//            RequestQueue requestQueue = Volley.newRequestQueue(this);
-//            StringRequest request = new StringRequest(Request.Method.POST, url1, new Response.Listener<String>() {
-//                @Override
-//                public void onResponse(String response) {
-//                    Toast.makeText(MainActivity.this, "Saved", Toast.LENGTH_SHORT).show();
-//                }
-//            }, new Response.ErrorListener() {
-//                @Override
-//                public void onErrorResponse(VolleyError error) {
-//                    Toast.makeText(MainActivity.this, error.getMessage().toString(), Toast.LENGTH_SHORT).show();
-//                }
-//            }) {
-//                @Override
-//                protected Map<String, String> getParams() throws AuthFailureError {
-//                    Map<String, String> map = new HashMap<>();
-//                    map.put("id", String.valueOf(users_account.uId));
-//                    map.put("notey", et.getText().toString());
-//                    return super.getParams();
-//                }
-//            };
-//            requestQueue.add(request);
-//            portfolioDB saveDB = new portfolioDB(this);
-//            SQLiteDatabase db = saveDB.getWritableDatabase();
-//             db.execSQL("insert into userNotes values (?)",new String[]{et.getText().toString()});
-
-//}
-//////////////////////////////////////////////////////////////////////////////////////////
-//        if (item.getItemId() == R.id.plugins_edit)//5
-//
-//        {
-//            Intent obj=getIntent();
-//            String url="https://mynovelsbox.000webhostapp.com/connect/myPortfolioEdit.php?notey="+et.getText().toString()+
-//                    "&usery="+users_account.usersAccount+"&passy="+obj.getStringExtra("password") ;
-//
-//            RequestQueue rq = Volley.newRequestQueue(this);
-//            StringRequest sr = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
-//                @Override
-//                public void onResponse(String response) {
-//                    Toast.makeText(MainActivity.this, response, Toast.LENGTH_SHORT).show();
-//                }
-//            }, new Response.ErrorListener() {
-//                @Override
-//                public void onErrorResponse(VolleyError error) {
-//                    Toast.makeText(MainActivity.this, "Failed...", Toast.LENGTH_SHORT).show();
-//                }
-//            });
-//
-//            rq.add(sr);
-//        }
-
-//    }
-
 
 }

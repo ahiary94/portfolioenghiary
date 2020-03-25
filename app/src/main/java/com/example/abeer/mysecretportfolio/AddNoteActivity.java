@@ -188,14 +188,6 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
         return super.onOptionsItemSelected(item);
     }
 
-    public void doFavoriteAction() {
-
-    }
-
-    public void doLockAction() {
-
-    }
-
     @Override
     public void onBackPressed() {
         if (!TextUtils.isEmpty(writeNote.getText().toString())
