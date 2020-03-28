@@ -44,6 +44,7 @@ public class PluginsGridActivity extends AppCompatActivity {
         if (flag == 11) {
             // secret
             setTitle("Secret Notes");
+            secretList.clear();
             secretList = database.selectSecretContent();
             adapter = new PluginsAdapter(secretList);
             recyclerView.setAdapter(adapter);
@@ -52,6 +53,7 @@ public class PluginsGridActivity extends AppCompatActivity {
 //            list.clear();
 //            list = database.selectFavouriteContent();dddd
             setTitle("Favourite Notes");
+            list.clear();
             list = database.selectFavouriteContent();
             favouriteAdapter = new FavouriteRecyclerAdapter(list);
             recyclerView.setAdapter(favouriteAdapter);

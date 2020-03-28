@@ -41,8 +41,8 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
     private Dialog dialog;
     private NotificationManager mNotificationManager;
     private threadClassPart threadClassPart;
-    private final int idSave = 1, idDelete = 2, idFavorite = 3, idLock = 4, idSecret = 5, idColor = 6;
-    private MenuItem itemFavorite, itemLock, itemSave, itemDelete, itemSecret, itemColor;
+    private final int idSave = 1, idDelete = 2, idFavorite = 3, idSecret = 5, idColor = 6;//, idLock = 4
+    private MenuItem itemFavorite, itemSave, itemDelete, itemSecret, itemColor;//, itemLock
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +71,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
         itemSave = menu.add(Menu.NONE, idSave, 1, "Save");
         itemDelete = menu.add(Menu.NONE, idDelete, 2, "Delete");
         itemFavorite = menu.add(Menu.NONE, idFavorite, 3, "Favorite");
-        itemLock = menu.add(Menu.NONE, idLock, 4, "Lock");
+//        itemLock = menu.add(Menu.NONE, idLock, 4, "Lock");
         itemSecret = menu.add(Menu.NONE, idSecret, 5, "Secret");
         itemColor = menu.add(Menu.NONE, idColor, 6, "Color");
 
@@ -82,7 +82,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
         itemSave.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         itemDelete.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         itemFavorite.setCheckable(true);
-        itemLock.setCheckable(true);
+//        itemLock.setCheckable(true);
         itemSecret.setCheckable(true);
 
         if (AddNoteModel.bit == 1) {
@@ -124,32 +124,32 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
                 }
                 Log.e("checked ", " favourite " + model.getFavourite() + " lock " + model.getLock());
                 break;
-            case 4: // Lock
-                    itemLock.setEnabled(true);
-                    itemLock.setCheckable(true);
-                    if (model.getLock() == 0) {
-                        model.setLock(1);
-                        itemLock.setChecked(true);
-                        itemSecret.setEnabled(false);
-                    } else {
-                        model.setLock(0);
-                        itemLock.setChecked(false);
-                        if (model.getFavourite() == 0)
-                            itemSecret.setEnabled(true);
-                }
-                break;
+//            case 4: // Lock
+//                    itemLock.setEnabled(true);
+//                    itemLock.setCheckable(true);
+//                    if (model.getLock() == 0) {
+//                        model.setLock(1);
+////                        itemLock.setChecked(true);
+//                        itemSecret.setEnabled(false);
+//                    } else {
+//                        model.setLock(0);
+////                        itemLock.setChecked(false);
+//                        if (model.getFavourite() == 0)
+//                            itemSecret.setEnabled(true);
+//                }
+//                break;
             case 5: // Secret
                 itemSecret.setCheckable(true);
                 if (model.getSecret() == 0) {
                     model.setSecret(1);
                     itemFavorite.setEnabled(false);
-                    itemLock.setEnabled(false);
+//                    itemLock.setEnabled(false);
                     itemSecret.setChecked(true);
                     Log.e("secret", "" + model.getSecret());
                 } else {
                     model.setSecret(0);
                     itemFavorite.setEnabled(true);
-                    itemLock.setEnabled(true);
+//                    itemLock.setEnabled(true);
                     itemSecret.setChecked(false);
                     Log.e("secret", "" + model.getSecret());
                 }
@@ -235,7 +235,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
             addNoteDatabase.updateContent(id, model.getTitle(), model.getNote(), model.getColor());
             Log.e("fav after edit", "" + model.getFavourite());
             Log.e("lock after edit", "" + model.getLock());
-            addNoteDatabase.updatePlugins(model.getPluginsID(), model.getFavourite(), model.getLock(), model.getSecret());
+            addNoteDatabase.updatePlugins(model.getPluginsID(), model.getFavourite(), 0, model.getSecret());
             Toast.makeText(this, "Updated Successfully", Toast.LENGTH_SHORT).show();
 //            snackbar = Snackbar.make(coordinatorLayout, "Updated Successfully", Snackbar.LENGTH_SHORT);
 //            snackbar.show();
@@ -258,7 +258,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
                     int noteID = cursor.getInt(0);
                     Log.e("returned id", "" + noteID);
                     cursor.close();
-                    addNoteDatabase.addPluginsContent(noteID, model.getFavourite(), model.getLock(), model.getSecret());
+                    addNoteDatabase.addPluginsContent(noteID, model.getFavourite(), 0, model.getSecret());
                     Cursor cursor1 = addNoteDatabase.selectPluginsContent();
                     if (cursor1.moveToFirst()) {
                         do {
@@ -329,7 +329,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
             itemFavorite.setChecked(true);
         }
         if (this.model.getLock() == 1) {
-            itemLock.setChecked(true);
+//            itemLock.setChecked(true);
         }
         if (this.model.getSecret() == 1) {
             itemSecret.setChecked(true);
