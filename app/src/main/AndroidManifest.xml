@@ -47,12 +47,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".passwordAct"
-            android:label="Login" />
-        <activity
-            android:name=".SignUpActivity"
-            android:label="Register" />
-        <activity
             android:name=".SplashAct"
             android:label="My notes"
             android:noHistory="false"

@@ -20,8 +20,8 @@ public class SplashAct extends AppCompatActivity implements Runnable{
 
     @Override
     public void run() {
-        Intent intent = new Intent(SplashAct.this,passwordAct.class);
-        startActivity(intent);
-        finish();
+//        Intent intent = new Intent(SplashAct.this,passwordAct.class);
+//        startActivity(intent);
+//        finish();
     }
 }
