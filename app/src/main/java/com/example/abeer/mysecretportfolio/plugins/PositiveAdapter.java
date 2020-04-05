@@ -2,7 +2,6 @@ package com.example.abeer.mysecretportfolio.plugins;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,15 +13,18 @@ import com.example.abeer.mysecretportfolio.R;
 
 import java.util.List;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 public class PositiveAdapter extends RecyclerView.Adapter<PositiveAdapter.ViewHolderLocal> {
 
-//    private List<PositiveQuoteModel> list;
-private Context mContext;
+    //    private List<PositiveQuoteModel> list;
+    private Context mContext;
     private List<Bitmap> bitmapList;
 
-    public PositiveAdapter(Context mContext,List<Bitmap> bitmapList){//}Context context, ArrayList<String> names, ArrayList<String> imageUrls) {
+    public PositiveAdapter(Context mContext, List<Bitmap> bitmapList) {//}Context context, ArrayList<String> names, ArrayList<String> imageUrls) {
         this.bitmapList = bitmapList;
         this.mContext = mContext;
+        setHasStableIds(true);
 
     }
 
@@ -59,6 +61,16 @@ private Context mContext;
     @Override
     public int getItemCount() {
         return bitmapList.size();
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position;
     }
 
     public class ViewHolderLocal extends RecyclerView.ViewHolder {

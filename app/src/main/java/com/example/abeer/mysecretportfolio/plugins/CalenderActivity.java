@@ -1,11 +1,12 @@
 package com.example.abeer.mysecretportfolio.plugins;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.example.abeer.mysecretportfolio.R;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 public class CalenderActivity extends AppCompatActivity {
 

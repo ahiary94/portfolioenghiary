@@ -4,7 +4,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
-    <string name="portfolio">Portfolio</string>
+    <string name="portfolio">Notes</string>
 
     <string name="open">Open</string>
     <string name="close">Close</string>
@@ -25,6 +25,14 @@
     <string name="lock">Lock to taskbar</string>
     <string name="secret">Secret</string>
     <string name="delete">Delete</string>
+
+    <string name="voice_note">voice Note</string>
+<!--        <string name="quote_banner_id">ca-app-pub-3940256099942544/6300978111</string>-->
+
+    <string name="color_dialog_banner_id">ca-app-pub-7003859395474560/9623239116</string>
+    <string name="delete_dialog_banner_id">ca-app-pub-7003859395474560/4982174573</string>
+    <string name="add_note_banner_id">ca-app-pub-7003859395474560/4962186792</string>
+    <string name="quote_banner_id">ca-app-pub-7003859395474560/9526217956</string>
 
 
 </resources>

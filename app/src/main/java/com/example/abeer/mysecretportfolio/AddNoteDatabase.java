@@ -3,21 +3,20 @@ package com.example.abeer.mysecretportfolio;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.example.abeer.mysecretportfolio.models.AddNoteModel;
 import com.example.abeer.mysecretportfolio.models.FavouriteModel;
 import com.example.abeer.mysecretportfolio.models.HomeModel;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.Nullable;
 
 public class AddNoteDatabase extends SQLiteOpenHelper {
 
@@ -212,6 +211,8 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
     public void clearDatabase() {
         SQLiteDatabase database = this.getWritableDatabase();
         database.delete(NOTES_TABLE, "1", null);
+        database.delete(PLUGINS_TABLE, "1", null);
+
     }
 
     public void clearNote(int id) {
@@ -232,6 +233,7 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
 
     public List<Bitmap> getImage() {
         SQLiteDatabase database = getWritableDatabase();
+        database.beginTransaction();
         List<Bitmap> bitmapList = new ArrayList<>();
         String query = "SELECT * FROM " + QUOTE_TABLE;
         Cursor cursor = database.rawQuery(query, null);
@@ -241,6 +243,7 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
                 bitmapList.add(BitmapFactory.decodeByteArray(image, 0, image.length));
 
             } while (cursor.moveToNext());
+            database.endTransaction();
         return bitmapList;
     }
 
@@ -306,19 +309,19 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
         return list;
     }
 
-    public List<FavouriteModel> selectFavouriteContent() {
+    public List<HomeModel> selectFavouriteContent() {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT note_id,title,note,color FROM notes_table,plugins_table WHERE \n" +
                 "note_id == plugin_rid AND favorite = 1";
         Cursor cursor = db.rawQuery(query, null);
-        List<FavouriteModel> list = new ArrayList<>();
+        List<HomeModel> list = new ArrayList<>();
         if (cursor.moveToFirst())
             do {
-                FavouriteModel model = new FavouriteModel();
+                HomeModel model = new HomeModel();
                 model.setId(cursor.getInt(0));
                 model.setTitle(cursor.getString(1));
                 model.setNote(cursor.getString(2));
-                model.setBackgroundColor(cursor.getInt(3));
+                model.setColor(cursor.getInt(3));
 //                model.setColor(cursor.getString(3));
 //                model.setPluginId(cursor.getInt(4));
 //                model.setFavorite(cursor.getInt(5));

@@ -2,34 +2,38 @@ package com.example.abeer.mysecretportfolio.plugins;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.v7.app.AppCompatActivity;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 
-import com.etsy.android.grid.StaggeredGridView;
 import com.example.abeer.mysecretportfolio.AddNoteDatabase;
 import com.example.abeer.mysecretportfolio.R;
-import com.example.abeer.mysecretportfolio.plugins.PositiveAdapter;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+
 public class PositiveQuotesActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
     private RecyclerView gridView;
-//        private StaggeredGridView gridView;
-        private PositiveAdapter adapter;
-        private AddNoteDatabase database;
-        private List<Bitmap> bitmapList = new ArrayList<>();
-//    private QuotesRecyclerAdapter adapter;
+    private PositiveAdapter adapter;
+    private AddNoteDatabase database;
+    private List<Bitmap> bitmapList = new ArrayList<>();
+    private AdView adView;
+    private AdRequest adRequest;
+    private static final int ITEM_PER_AD = 5;
+    private static final int AD_HIGHT = 150;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,30 +46,16 @@ public class PositiveQuotesActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); //
 
-//        database.clearQuote();
-//        pushQuoteIntoDB(R.drawable.q1);
-//        pushQuoteIntoDB(R.drawable.q2);
-//        pushQuoteIntoDB(R.drawable.q3);
-//        pushQuoteIntoDB(R.drawable.q4);
-//        pushQuoteIntoDB(R.drawable.q5);
-//        pushQuoteIntoDB(R.drawable.q6);
-//        pushQuoteIntoDB(R.drawable.q7);
-//        pushQuoteIntoDB(R.drawable.q8);
-//        pushQuoteIntoDB(R.drawable.q9);
-//        pushQuoteIntoDB(R.drawable.q10);
+        adView = findViewById(R.id.positive_ad);
+        adRequest = new AdRequest.Builder().build();
+//        adView.setAdUnitId(getString(R.string.quote_banner_id));
+//        adView.setAdSize(AdSize.BANNER);
+        adView.loadAd(adRequest);
 
-        bitmapList = database.getImage();
-        adapter = new PositiveAdapter(this, bitmapList);
-        Log.e("size1", "" + bitmapList.size());
-        gridView.setLayoutManager(new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL));
-        gridView.setAdapter(adapter);
-//        recyclerView = findViewById(R.id.recyclerView_possitive_quotes);
-//        adapter = new QuotesRecyclerAdapter();
-//        recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
-//        recyclerView.setAdapter(adapter);
+        new FetchImages().execute();
     }
 
-    void pushQuoteIntoDB(Integer drawable){
+    void pushQuoteIntoDB(Integer drawable) {
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), drawable);
         database.addImageQuote(getBytes(bitmap));
     }
@@ -85,6 +75,24 @@ public class PositiveQuotesActivity extends AppCompatActivity {
         }
         return true;
     }
+
+    class FetchImages extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... strings) {
+            bitmapList = database.getImage();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            adapter = new PositiveAdapter(PositiveQuotesActivity.this, bitmapList);
+            Log.e("size1", "" + bitmapList.size());
+            gridView.setLayoutManager(new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL));
+            gridView.setAdapter(adapter);
+        }
+    }
+
 
     @Override
     public void onBackPressed() {

@@ -10,10 +10,20 @@
         android:id="@+id/toolbar_positiveQuotes_layout"
         layout="@layout/main_toolbar" />
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView_possitive_quotes"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@id/positive_ad"
         android:layout_below="@id/toolbar_positiveQuotes_layout"/>
+
+    <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/positive_ad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/quote_banner_id"/>
 
 </RelativeLayout>

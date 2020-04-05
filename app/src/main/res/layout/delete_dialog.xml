@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:ads="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="400dp"
+    android:layout_height="wrap_content">
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="20dp"
+        android:drawableLeft="@drawable/ic_delete_black_24dp"
+        android:fontFamily="casual"
+        android:textSize="18sp"
+        android:text="Delete" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="25dp"
+        android:layout_marginTop="10dp"
+        android:fontFamily="casual"
+        android:text="Are you want delete this note ?" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="right|end"
+        android:layout_marginBottom="20dp"
+        android:gravity="right|end"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/deleteDialog_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="casual"
+            android:text="Cancel"
+            android:textColor="@color/redf" />
+
+        <TextView
+            android:id="@+id/deleteDialog_ok"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|end"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="20dp"
+            android:fontFamily="casual"
+            android:text="Yes" />
+
+    </LinearLayout>
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/deleteDialog_ad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/delete_dialog_banner_id"/>
+</LinearLayout>

@@ -2,15 +2,10 @@ package com.example.abeer.mysecretportfolio;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.NotificationManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -22,33 +17,57 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.abeer.mysecretportfolio.models.HomeModel;
 import com.example.abeer.mysecretportfolio.models.AddNoteModel;
+import com.example.abeer.mysecretportfolio.models.HomeModel;
+import com.example.abeer.mysecretportfolio.plugins.PluginsGridActivity;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 
-import de.hdodenhof.circleimageview.CircleImageView;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
-public class AddNoteActivity extends AppCompatActivity implements View.OnClickListener{
+import static com.example.abeer.mysecretportfolio.MainActivity.ACTIVITY_SOURCE;
+
+public class AddNoteActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Toolbar toolbar;
     private LinearLayout coordinatorLayout;
-    private Snackbar snackbar;
     private Activity activity;
     private EditText writeNote, titleEditText;
-    private TextView pinkTextView, yellowTextView, blueTextView, whiteTextView, greenTextView, purpleTextView, orangeTextView, defaultTextView, greenWallpaperTextView, brownTextView, randomTextView;
+    private TextView pinkTextView, yellowTextView, blueTextView, whiteTextView, greenTextView, purpleTextView, orangeTextView, defaultTextView, greenWallpaperTextView, brownTextView, randomTextView, okDelete, cancelDelete;
     private AddNoteDatabase addNoteDatabase;
     private AddNoteModel model;
     private int id = 0, noteFlag = 0;
     private Dialog dialog;
-    private NotificationManager mNotificationManager;
-    private threadClassPart threadClassPart;
     private final int idSave = 1, idDelete = 2, idFavorite = 3, idSecret = 5, idColor = 6;//, idLock = 4
     private MenuItem itemFavorite, itemSave, itemDelete, itemSecret, itemColor;//, itemLock
+    private AdView colorAdView, deleteAdView, addNoteAd;
+    private AdRequest adRequest, adRequest2, adRequest3;
+    private int sourceActivity = 0;// know the source of activity that send the edit or view request
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_note);
         activity = this;
+
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+
+            }
+        });
+
+        addNoteAd = findViewById(R.id.add_note_ad);
+        adRequest3 = new AdRequest.Builder().build();
+//        addNoteAd.setAdUnitId(getString(R.string.add_note_banner_id));
+//        addNoteAd.setAdSize(AdSize.BANNER);
+        addNoteAd.loadAd(adRequest3);
 
         toolbar = findViewById(R.id.add_note_toolbar);
         coordinatorLayout = findViewById(R.id.add_note_coordinatorLayout);
@@ -98,10 +117,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
                 onBackPressed();
                 return true;
             case 1: // Save
-                if (writeNote.getText().length() != 0 || titleEditText.getText().length() != 0)
-                    saveNote();
-                else
-                    Toast.makeText(this, "The note is empty!", Toast.LENGTH_SHORT).show();
+                saveNote();
                 break;
             case 2: // Delete
                 if (AddNoteModel.bit == 1) {
@@ -168,8 +184,12 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
                 orangeTextView = dialog.findViewById(R.id.color_list_orange);
                 defaultTextView = dialog.findViewById(R.id.color_list_default);
                 greenWallpaperTextView = dialog.findViewById(R.id.color_list_greenWallpaper);
-//                brownTextView = dialog.findViewById(R.id.color_list_brown);
-//                randomTextView = dialog.findViewById(R.id.color_list_random);
+
+                colorAdView = dialog.findViewById(R.id.colorDialog_ad);
+                adRequest = new AdRequest.Builder().build();
+//                colorAdView.setAdUnitId(getString(R.string.color_dialog_banner_id));
+//                colorAdView.setAdSize(AdSize.BANNER);
+                colorAdView.loadAd(adRequest);
 
                 pinkTextView.setOnClickListener(this);
                 blueTextView.setOnClickListener(this);
@@ -190,61 +210,54 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onBackPressed() {
-        if (!TextUtils.isEmpty(writeNote.getText().toString())
-                && !TextUtils.isEmpty(titleEditText.getText().toString())) {
-            saveNote();
-        }
+        saveNote();
         super.onBackPressed();
 
     }
 
-    public void lockNoteToNotificationBar() {
-//        mNotificationManager = (NotificationManager)
-//                getSystemService(Context.NOTIFICATION_SERVICE);
-//
-//        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-//                i, PendingIntent.FLAG_ONE_SHOT);
-//
-//        NotificationCompat.Builder mBuilder =
-//                new NotificationCompat.Builder(this)
-//                        .setSmallIcon(R.drawable.ic_launcher)
-//                        .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher))
-//                        .setContentTitle(title)
-//                        .setDefaults(Notification.DEFAULT_SOUND)
-//                        .setStyle(new NotificationCompat.BigTextStyle()
-//                                .bigText(msg))
-//                        .setContentText(msg)
-//                        .setPriority(Notification.PRIORITY_MAX);
-//
-//        mBuilder.setContentIntent(contentIntent);
-//        mNotificationManager.notify((int) value, mBuilder.build());
-    }
-
     public void saveNote() {
-        model.setNote("" + writeNote.getText());
-        model.setTitle("" + titleEditText.getText());
-        if (AddNoteModel.bit == 0) { // new note
-//            Log.e("after adding to db", "" + model.getId());
-            addNoteDatabase.addContent(model.getTitle(), model.getNote(), model.getColor(), noteFlag);
-//            Log.e("...........", "savePluginsInformation");
-            new threadClassPart().start();///////////////
-//            snackbar = Snackbar.make(coordinatorLayout, "Added Successfully", Snackbar.LENGTH_SHORT);
-//            snackbar.show();
-            Toast.makeText(this, "Added Successfully", Toast.LENGTH_SHORT).show();
-        } else if (AddNoteModel.bit == 1) { // edit note
-            addNoteDatabase.updateContent(id, model.getTitle(), model.getNote(), model.getColor());
-            Log.e("fav after edit", "" + model.getFavourite());
-            Log.e("lock after edit", "" + model.getLock());
-            addNoteDatabase.updatePlugins(model.getPluginsID(), model.getFavourite(), 0, model.getSecret());
-            Toast.makeText(this, "Updated Successfully", Toast.LENGTH_SHORT).show();
-//            snackbar = Snackbar.make(coordinatorLayout, "Updated Successfully", Snackbar.LENGTH_SHORT);
-//            snackbar.show();
-        }
+        if (!TextUtils.isEmpty(writeNote.getText().toString())
+                || !TextUtils.isEmpty(titleEditText.getText().toString())) {
 
-        AddNoteModel.bit = 0;
-        Intent goToHome = new Intent(AddNoteActivity.this, MainActivity.class);
-        startActivity(goToHome);
-        finish();
+            model.setNote("" + writeNote.getText());
+            model.setTitle("" + titleEditText.getText());
+            if (AddNoteModel.bit == 0) { // new note
+//            Log.e("after adding to db", "" + model.getId());
+                addNoteDatabase.addContent(model.getTitle(), model.getNote(), model.getColor(), noteFlag);
+                new threadClassPart().start();
+//                publicMethods.showSnackbar("Added Successfully", R.drawable.ic_check);
+                Toast.makeText(this, "Added Successfully", Toast.LENGTH_SHORT).show();
+            } else if (AddNoteModel.bit == 1) { // edit note
+                addNoteDatabase.updateContent(id, model.getTitle(), model.getNote(), model.getColor());
+                Log.e("fav after edit", "" + model.getFavourite());
+                Log.e("lock after edit", "" + model.getLock());
+                addNoteDatabase.updatePlugins(model.getPluginsID(), model.getFavourite(), 0, model.getSecret());
+//                publicMethods.showSnackbar("Updated Successfully", R.drawable.ic_check);
+                Toast.makeText(this, "Updated Successfully", Toast.LENGTH_SHORT).show();
+            }
+
+            AddNoteModel.bit = 0;
+            switch (sourceActivity) {
+                case 1:// main
+                    Intent goToHome = new Intent(AddNoteActivity.this, MainActivity.class);
+                    startActivity(goToHome);
+                    finish();
+                    break;
+                case 2:// favourite
+                    Intent goToFav = new Intent(AddNoteActivity.this, PluginsGridActivity.class);
+                    goToFav.putExtra("flag", 12); // favourite
+                    startActivity(goToFav);
+                    finish();
+                    break;
+                case 3: // secret
+                    Intent goToSecret = new Intent(AddNoteActivity.this, PluginsGridActivity.class);
+                    goToSecret.putExtra("flag", 11); // secret
+                    startActivity(goToSecret);
+                    finish();
+                    break;
+            }
+
+        }
     }
 
     public class threadClassPart extends Thread {
@@ -259,6 +272,8 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
                     Log.e("returned id", "" + noteID);
                     cursor.close();
                     addNoteDatabase.addPluginsContent(noteID, model.getFavourite(), 0, model.getSecret());
+                    if (model.getSecret() == 1)
+                        Toast.makeText(activity, "Added to secret list", Toast.LENGTH_SHORT).show();
                     Cursor cursor1 = addNoteDatabase.selectPluginsContent();
                     if (cursor1.moveToFirst()) {
                         do {
@@ -279,12 +294,22 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     public void deleteTheNote() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Are You Want Delete it?");
-        builder.setIcon(R.drawable.ic_delete_black_24dp);
-        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+        final Dialog deleteDialog = new Dialog(this);
+        deleteDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        deleteDialog.setContentView(R.layout.delete_dialog);
+
+        okDelete = deleteDialog.findViewById(R.id.deleteDialog_ok);
+        cancelDelete = deleteDialog.findViewById(R.id.deleteDialog_cancel);
+
+        deleteAdView = deleteDialog.findViewById(R.id.deleteDialog_ad);
+        adRequest2 = new AdRequest.Builder().build();
+//        deleteAdView.setAdUnitId(getString(R.string.delete_dialog_banner_id));
+//        deleteAdView.setAdSize(AdSize.BANNER);
+        deleteAdView.loadAd(adRequest2);
+
+        okDelete.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(View view) {
                 Toast.makeText(AddNoteActivity.this, "The note is deleted", Toast.LENGTH_SHORT).show();
                 addNoteDatabase.clearNote(id);
                 AddNoteModel.bit = 0;
@@ -293,14 +318,14 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
                 finish();
             }
         });
-        builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
 
+        cancelDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deleteDialog.dismiss();
             }
         });
-        builder.show();
+        deleteDialog.show();
 
     }
 
@@ -308,6 +333,9 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
 //        Log.e("receiveIntentInfo", "Done");
         // this method will called from HomePageFragment for editting the note
         // the bit value is 1 now
+
+        sourceActivity = getIntent().getIntExtra(ACTIVITY_SOURCE, 1);
+        Log.e("source", "" + sourceActivity);
         Bundle bundle = getIntent().getExtras();
         HomeModel model = (HomeModel) bundle.getSerializable("model");
         id = model.getId();

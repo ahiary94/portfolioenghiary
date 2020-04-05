@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
 
     <application
@@ -15,7 +16,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:ignore="GoogleAppIndexingWarning">
+        tools:ignore="GoogleAppIndexingWarning"
+       >
+
+        <meta-data
+            android:name="com.google.android.gms.ads.AD_MANAGER_APP"
+            android:value="true"/>
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-7003859395474560~7094150837"/>
+
         <activity
             android:name=".plugins.PluginsGridActivity"
             android:screenOrientation="sensorPortrait" />
@@ -27,7 +38,8 @@
         <activity
             android:name=".TestingActivity"
             android:label="Testing"
-            android:screenOrientation="sensorPortrait"/>
+            android:screenOrientation="sensorPortrait">
+        </activity>
         <activity
             android:name=".plugins.CalenderActivity"
             android:label="@string/calender"

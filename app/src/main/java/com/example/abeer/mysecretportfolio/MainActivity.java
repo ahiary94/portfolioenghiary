@@ -16,21 +16,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
-import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
@@ -52,11 +37,25 @@ import com.example.abeer.mysecretportfolio.models.HomeModel;
 import com.example.abeer.mysecretportfolio.plugins.CalenderActivity;
 import com.example.abeer.mysecretportfolio.plugins.PluginsGridActivity;
 import com.example.abeer.mysecretportfolio.plugins.PositiveQuotesActivity;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import static android.media.MediaRecorder.AudioSource.MIC;
 
@@ -70,8 +69,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private ActionBarDrawerToggle toggle;
-    private FragmentManager manager;
-    private FragmentTransaction transaction;
+    //    private FragmentManager manager;
+//    private FragmentTransaction transaction;
     //    private HomePageFragment homePageFragment;
     private AddNoteDatabase database;
     private MediaRecorder mediaRecorder;
@@ -93,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private SeekBar seekBar;
     private Runnable runnable;
     private Handler handler;
+    public static final String ACTIVITY_SOURCE = "SOURCE";
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -110,7 +110,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         recyclerView = findViewById(R.id.home_recyclerView);
 
         setSupportActionBar(toolbar);
-        toggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close);
+        toggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close) {
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+
+                getRecyclerItems();
+                recyclerView.setLayoutManager(new GridLayoutManager(getBaseContext(), 3));
+                adapter = new HomeRecyclerAdapter(list, MainActivity.this, database);
+                recyclerView.setAdapter(adapter);
+            }
+        };
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); //
@@ -140,6 +150,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Bundle bundle = new Bundle();
         bundle.putSerializable("model", model);
         intent.putExtras(bundle);
+        intent.putExtra(ACTIVITY_SOURCE, 1);
         AddNoteModel.bit = 1;
 //        Log.e("id editing", "" + model.getId());
 //        Log.e("pluginid editing", "" + model.getPluginId());
@@ -289,7 +300,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         public void onClick(View view) {
             switch (view.getId()) {
 
-                case R.id.voiceMessage_play:{
+                case R.id.voiceMessage_play: {
                     if (mediaPlayer != null && length > 0) {
                         mediaPlayer.seekTo(length);
                         seekBar.setMax(mediaPlayer.getDuration());
@@ -342,8 +353,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             mediaPlayer.seekTo(length);
                             changeSeekbar();
                         }
-                    });}
-                    break;
+                    });
+                }
+                break;
                 case R.id.voiceMessage_pause:
                     if (mediaPlayer != null) {
                         length = mediaPlayer.getCurrentPosition();
@@ -411,7 +423,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         snackbar = Snackbar.make(coordinator, Html.fromHtml("<font color=\"#5951EE\">" + message + "</font>"), Snackbar.LENGTH_SHORT);
         View snackbarLayout = snackbar.getView();
-        TextView textView = snackbarLayout.findViewById(android.support.design.R.id.snackbar_text);
+        TextView textView = snackbarLayout.findViewById(R.id.snackbar_text);
         textView.setCompoundDrawablesWithIntrinsicBounds(drawable, 0, 0, 0);
         textView.setCompoundDrawablePadding(15);
 //        textView.setCompoundDrawablePadding(getResources().getDimensionPixelOffset(R.dimen.snackbar_icon_padding));
@@ -433,8 +445,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(MainActivity.this, "The note is deleted", Toast.LENGTH_SHORT).show();
                 database.clearNote(id);
+                showSnackbar("The note is deleted", R.drawable.ic_check);
                 notifyAdapter();
             }
         });
@@ -462,7 +474,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Log.e("cal", "calender");
         switch (item.getItemId()) {
             case R.id.plugins_calender:
-                drawerLayout.closeDrawer(Gravity.START);
+                drawerLayout.closeDrawer(Gravity.LEFT);
                 Intent calenderIntent = new Intent(MainActivity.this, CalenderActivity.class);
                 startActivity(calenderIntent);
                 break;
