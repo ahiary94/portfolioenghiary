@@ -27,6 +27,10 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -49,7 +53,9 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
     private AdView colorAdView, deleteAdView, addNoteAd;
     private AdRequest adRequest, adRequest2, adRequest3;
     private int sourceActivity = 0;// know the source of activity that send the edit or view request
-
+    private Date date;
+    private SimpleDateFormat dateFormat;
+    private String noteTime = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +89,10 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
 
         writeNote = findViewById(R.id.add_note_editText);
         titleEditText = findViewById(R.id.add_note_toolbar_editText);
+
+        date = Calendar.getInstance().getTime();
+        dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        noteTime = dateFormat.format(date);
     }
 
     @Override
@@ -223,12 +233,12 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
             model.setTitle("" + titleEditText.getText());
             if (AddNoteModel.bit == 0) { // new note
 //            Log.e("after adding to db", "" + model.getId());
-                addNoteDatabase.addContent(model.getTitle(), model.getNote(), model.getColor(), noteFlag);
+                addNoteDatabase.addContent(model.getTitle(), model.getNote(), model.getColor(), noteFlag, noteTime);
                 new threadClassPart().start();
 //                publicMethods.showSnackbar("Added Successfully", R.drawable.ic_check);
                 Toast.makeText(this, "Added Successfully", Toast.LENGTH_SHORT).show();
             } else if (AddNoteModel.bit == 1) { // edit note
-                addNoteDatabase.updateContent(id, model.getTitle(), model.getNote(), model.getColor());
+                addNoteDatabase.updateContent(id, model.getTitle(), model.getNote(), model.getColor(), noteTime);
                 Log.e("fav after edit", "" + model.getFavourite());
                 Log.e("lock after edit", "" + model.getLock());
                 addNoteDatabase.updatePlugins(model.getPluginsID(), model.getFavourite(), 0, model.getSecret());
@@ -237,6 +247,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
             }
 
             AddNoteModel.bit = 0;
+            Log.e("source", ""+sourceActivity);
             switch (sourceActivity) {
                 case 1:// main
                     Intent goToHome = new Intent(AddNoteActivity.this, MainActivity.class);

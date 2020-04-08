@@ -5,10 +5,11 @@
     android:background="@color/lightPink">
 
     <ImageView
-        android:layout_width="100dp"
-        android:layout_height="150dp"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:background="#4d4c4b"
         android:layout_centerHorizontal="true"
-        android:src="@drawable/mynote_logo" />
+        android:src="@drawable/h" />
 
 
 </RelativeLayout>

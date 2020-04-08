@@ -1,6 +1,7 @@
 package com.example.abeer.mysecretportfolio.plugins;
 
 import android.database.Cursor;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,8 +38,11 @@ public class PluginsAdapter extends RecyclerView.Adapter<PluginsAdapter.PluginsV
     @Override
     public void onBindViewHolder(@NonNull PluginsViewHolder holder, final int position) {
         holder.title.setText(list.get(position).getTitle());
+        holder.title.setBackgroundResource(list.get(position).getColor());
         holder.textView.setText(list.get(position).getNote());
         holder.textView.setBackgroundResource(list.get(position).getColor());
+        holder.date.setText(list.get(position).getDate());
+        Log.e("secret", "date" + list.get(position).getDate());
 
 //        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
 //            @Override
@@ -80,12 +84,15 @@ public class PluginsAdapter extends RecyclerView.Adapter<PluginsAdapter.PluginsV
     class PluginsViewHolder extends RecyclerView.ViewHolder {
         TextView textView;
         TextView title;
+        TextView date;
 
         public PluginsViewHolder(View itemView) {
             super(itemView);
 
             textView = itemView.findViewById(R.id.home_add_new_note);
             title = itemView.findViewById(R.id.textView_favorite_title);
+            date = itemView.findViewById(R.id.textView_favorite_date);
+
         }
     }
 }

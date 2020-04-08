@@ -41,7 +41,11 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -93,6 +97,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Runnable runnable;
     private Handler handler;
     public static final String ACTIVITY_SOURCE = "SOURCE";
+//    private Calendar calendar;
+    private Date date;
+    private SimpleDateFormat dateFormat;
+    private String noteTime = "";
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -101,6 +109,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
 
 //        TrafficStats.setThreadStatsTag(THREAD_ID);
+//        calendar = Calendar.getInstance();
+        date = Calendar.getInstance().getTime();
+        dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        noteTime = dateFormat.format(date);
+//        Log.e("date", noteTime);
+
         activity = this;
         database = new AddNoteDatabase(this);
         coordinator = findViewById(R.id.main_coordinator);
@@ -142,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void getRecyclerItems() {
         list.clear();
         list = database.selectAllContent();
-        Log.e("size from db", "" + list.size());
+//        Log.e("size from db", "" + list.size());
     }
 
     public void goToAddNotePageForEditting(HomeModel model) {
@@ -369,7 +383,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     String title = "";
                     title = recordTitle.getText().toString();
                     if (!TextUtils.isEmpty(fileName)) {
-                        database.addContent(title, fileName, "2131165356", noteFlag);
+                        database.addContent(title, fileName, "2131165356", noteFlag, noteTime);
                         new threadClassPart().start();
                         Toast.makeText(MainActivity.this, "Saved successfully", Toast.LENGTH_SHORT).show();
                         voiceDialog.dismiss();

@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.abeer.mysecretportfolio.AddNoteDatabase;
@@ -34,14 +35,16 @@ public class FavouriteRecyclerAdapter extends RecyclerView.Adapter<FavouriteRecy
     @NonNull
     @Override
     public FavouriteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_row_favorite, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_row_layout, parent, false);
         return new FavouriteViewHolder(view);
     }
 
     public void onBindViewHolder(@NonNull FavouriteViewHolder holder, final int position) {
         holder.title.setText(list.get(position).getTitle());
+        holder.title.setBackgroundResource(list.get(position).getColor());
         holder.note.setText(list.get(position).getNote());
         holder.note.setBackgroundResource(list.get(position).getColor());
+        holder.date.setText(list.get(position).getDate());
 
 //        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
 //            @Override
@@ -83,13 +86,17 @@ public class FavouriteRecyclerAdapter extends RecyclerView.Adapter<FavouriteRecy
 
     public class FavouriteViewHolder extends RecyclerView.ViewHolder {
 
-        TextView title;
-        TextView note;
 
+        RelativeLayout noteLayout;
+        TextView note;
+        TextView title, date;
         public FavouriteViewHolder(View itemView) {
             super(itemView);
+            noteLayout = itemView.findViewById(R.id.home_container_note);
+            note = itemView.findViewById(R.id.home_add_new_note);
             title = itemView.findViewById(R.id.textView_favorite_title);
-            note = itemView.findViewById(R.id.textView_favorite_note);
+            date = itemView.findViewById(R.id.textView_favorite_date);
+
         }
     }
 

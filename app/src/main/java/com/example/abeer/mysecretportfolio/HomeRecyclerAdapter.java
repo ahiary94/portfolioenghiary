@@ -59,8 +59,9 @@ public class HomeRecyclerAdapter extends RecyclerView.Adapter<HomeRecyclerAdapte
             holder.noteLayout.setVisibility(View.VISIBLE);
             holder.voiceLayout.setVisibility(View.GONE);
             holder.title.setText(list.get(position).getTitle());
+            holder.background.setBackgroundResource(list.get(position).getColor());
             holder.textView.setText(list.get(position).getNote());
-            holder.textView.setBackgroundResource(list.get(position).getColor());
+            holder.date.setText(list.get(position).getDate());
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -89,6 +90,8 @@ public class HomeRecyclerAdapter extends RecyclerView.Adapter<HomeRecyclerAdapte
             holder.noteLayout.setVisibility(View.GONE);
             holder.voiceLayout.setVisibility(View.VISIBLE);
             holder.voiceTitle.setText(list.get(position).getTitle());
+            holder.voiceDate.setText(list.get(position).getDate());
+
             holder.play.setOnClickListener(new View.OnClickListener() {
                 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                 @Override
@@ -168,12 +171,13 @@ public class HomeRecyclerAdapter extends RecyclerView.Adapter<HomeRecyclerAdapte
     public class HomeViewHolder extends RecyclerView.ViewHolder {
 
         RelativeLayout noteLayout;
+        LinearLayout background;
         TextView textView;
-        TextView title;
+        TextView title, date;
 
         LinearLayout voiceLayout;
         Button play, pause, delete;
-        TextView voiceTitle;
+        TextView voiceTitle, voiceDate;
         SeekBar seekBar;
 
         public HomeViewHolder(View itemView) {
@@ -182,6 +186,8 @@ public class HomeRecyclerAdapter extends RecyclerView.Adapter<HomeRecyclerAdapte
             noteLayout = itemView.findViewById(R.id.home_container_note);
             textView = itemView.findViewById(R.id.home_add_new_note);
             title = itemView.findViewById(R.id.textView_favorite_title);
+            date = itemView.findViewById(R.id.textView_favorite_date);
+            background = itemView.findViewById(R.id.home_background);
 
             voiceLayout = itemView.findViewById(R.id.home_container_voice);
             seekBar = itemView.findViewById(R.id.home_voiceMessage_seekbar);
@@ -189,7 +195,10 @@ public class HomeRecyclerAdapter extends RecyclerView.Adapter<HomeRecyclerAdapte
             pause = itemView.findViewById(R.id.home_voiceMessage_pause);
             delete = itemView.findViewById(R.id.home_voiceMessage_delete);
             voiceTitle = itemView.findViewById(R.id.home_voiceMessage_title);
+            voiceDate =itemView.findViewById(R.id.home_voiceMessage_date);
 
         }
+
+
     }
 }

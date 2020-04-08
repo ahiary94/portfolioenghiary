@@ -21,7 +21,7 @@ import androidx.annotation.Nullable;
 public class AddNoteDatabase extends SQLiteOpenHelper {
 
     private static final String NOTE_DB_NAME = "myNoteAppDB";
-    private static final int NOTE_DB_VERSION = 7;
+    private static final int NOTE_DB_VERSION = 8;
 
     private String NOTES_TABLE = "notes_table";
 
@@ -30,6 +30,7 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
     private String NOTES_NOTE = "note";
     private String NOTES_COLOR = "color";
     private String NOTES_FLAG = "flag";// 0 => hand note , 1 => voice note
+    private String NOTES_DATE = "date";// 0 => hand note , 1 => voice note
 
     // **********************************************************
     private String PLUGINS_TABLE = "plugins_table";
@@ -78,7 +79,8 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
                 + NOTES_TITLE + " VARCHAR,"
                 + NOTES_NOTE + " VARCHAR,"
                 + NOTES_COLOR + " VARCHAR,"
-                + NOTES_FLAG + " INTEGER"
+                + NOTES_FLAG + " INTEGER,"
+                + NOTES_DATE + " TEXT"
                 + ");";
 
         String sqlQuery2 = "CREATE TABLE IF NOT EXISTS " + PLUGINS_TABLE + "("
@@ -107,8 +109,8 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("ALTER TABLE " + NOTES_TABLE + " ADD COLUMN " + NOTES_FLAG + " INTEGER");
-        db.execSQL("UPDATE " + NOTES_TABLE + " SET " + NOTES_FLAG + " = 0");
+        db.execSQL("ALTER TABLE " + NOTES_TABLE + " ADD COLUMN " + NOTES_DATE + " TEXT");
+//        db.execSQL("UPDATE " + NOTES_TABLE + " SET " + NOTES_DATE + " = 4/7/2020");
 //        db.execSQL("ALTER TABLE " + PASSWORD_TABLE + " ADD COLUMN " + PASSWORD + " VARCHAR");
 //        db.execSQL("CREATE TABLE IF NOT EXISTS " + QUOTE_TABLE + "("
 //                + QUOTE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -130,13 +132,14 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
         database.insert(QUOTE_TABLE, null, contentValues);
     }
 
-    public boolean addContent(String title, String note, String color, int flag) {
+    public boolean addContent(String title, String note, String color, int flag, String date) {
         SQLiteDatabase database = getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(NOTES_TITLE, title);
         contentValues.put(NOTES_NOTE, note);
         contentValues.put(NOTES_COLOR, color);
         contentValues.put(NOTES_FLAG, flag);
+        contentValues.put(NOTES_DATE, date);
 
         database.insert(NOTES_TABLE, null, contentValues);
         return true;
@@ -173,12 +176,13 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
 
     //------------------------------------- UPDATE -----------------------------
 
-    public void updateContent(int id, String title, String note, String color) {
+    public void updateContent(int id, String title, String note, String color, String date) {
         SQLiteDatabase database = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(NOTES_TITLE, title);
         contentValues.put(NOTES_NOTE, note);
         contentValues.put(NOTES_COLOR, color);
+        contentValues.put(NOTES_DATE, date);
         database.update(NOTES_TABLE, contentValues, NOTES_ID + " = ?", new String[]{String.valueOf(id)});
     }
 
@@ -249,7 +253,7 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
 
     public List<HomeModel> selectAllContent() {
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT note_id,title,note,color,plugin_rid,favorite,lock,secret,flag FROM notes_table,plugins_table WHERE \n" +
+        String query = "SELECT note_id,title,note,color,plugin_rid,favorite,lock,secret,flag,date FROM notes_table,plugins_table WHERE \n" +
                 "note_id == plugin_rid AND secret = 0";
         Cursor cursor = db.rawQuery(query, null);
         List<HomeModel> list = new ArrayList<>();
@@ -265,6 +269,7 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
                 model.setPinToTaskbar(cursor.getInt(6));
                 model.setSecret(cursor.getInt(7));
                 model.setNoteFlag(cursor.getInt(8));
+                model.setDate(cursor.getString(9));
 
                 Log.e("secretDB ", "" + model.getSecret());
 
@@ -289,7 +294,7 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
 
     public List<HomeModel> selectSecretContent() {
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT note_id,title,note,color,secret FROM notes_table,plugins_table WHERE \n" +
+        String query = "SELECT note_id,title,note,color,secret,date FROM notes_table,plugins_table WHERE \n" +
                 "note_id == plugin_rid AND secret = 1";
         Cursor cursor = db.rawQuery(query, null);
         List<HomeModel> list = new ArrayList<>();
@@ -301,6 +306,7 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
                 model.setNote(cursor.getString(2));
                 model.setColor(Integer.parseInt(cursor.getString(3)));
                 model.setSecret(cursor.getInt(4));
+                model.setDate(cursor.getString(5));
 
                 Log.e("secret page", "secret" + model.getSecret());
 
@@ -311,7 +317,7 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
 
     public List<HomeModel> selectFavouriteContent() {
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT note_id,title,note,color FROM notes_table,plugins_table WHERE \n" +
+        String query = "SELECT note_id,title,note,color,date FROM notes_table,plugins_table WHERE \n" +
                 "note_id == plugin_rid AND favorite = 1";
         Cursor cursor = db.rawQuery(query, null);
         List<HomeModel> list = new ArrayList<>();
@@ -322,6 +328,8 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
                 model.setTitle(cursor.getString(1));
                 model.setNote(cursor.getString(2));
                 model.setColor(cursor.getInt(3));
+                model.setDate(cursor.getString(4));
+
 //                model.setColor(cursor.getString(3));
 //                model.setPluginId(cursor.getInt(4));
 //                model.setFavorite(cursor.getInt(5));
@@ -370,13 +378,6 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(id)});
         return cursor;
     }
-
-//    public Cursor selectFavouriteContent() {
-//        SQLiteDatabase db = this.getReadableDatabase();
-//        String query = "SELECT title,note,color FROM notes_table,plugins_table WHERE favorite = 1";
-//        Cursor cursor = db.rawQuery(query, null);
-//        return cursor;
-//    }
 
     public Cursor selectTheLastRow() {
         SQLiteDatabase db = this.getReadableDatabase();

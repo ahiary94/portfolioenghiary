@@ -14,6 +14,15 @@ public class HomeModel implements Serializable {
     private int secret;
     private String secretPasswordDialog;
     private int noteFlag;
+    private String date;
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
 
     public int getNoteFlag() {
         return noteFlag;
