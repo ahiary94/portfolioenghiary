@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Notes</string>
+    <string name="open">Open</string>
+    <string name="close">Close</string>
+
+    <string name="background">الخلفية</string>
+    <string name="edit">تحرير</string>
+    <string name="save">حفظ</string>
+    <string name="add">مذكرة جديدة</string>
+    <string name="voice_message">مذكرة صوتية جديدة</string>
+
+    <string name="calender">التقويم</string>
+    <string name="positive">اقتباسات ايجابية</string>
+    <string name="favourite_list">المفضلة</string>
+    <string name="delete_all">حذف الكل</string>
+    <string name="exit">خروج</string>
+
+    <string name="favourite">اضافة الى المفضلة</string>
+    <string name="lock">اضافة الى شريط الاشعارات</string>
+    <string name="secret">خاص</string>
+
+    <string name="voice_note">مذكرة صوتية</string>
+    <string name="hint_title">عنوان...</string>
+    <string name="delete">حذف</string>
+    <string name="are_you_want_delete_this_note">هل ترغب بحذف هذه المذكرة؟</string>
+    <string name="cancel">الغاء</string>
+    <string name="yes">نعم</string>
+    <string name="note">اكتب هنا..</string>
+    <string name="password">كلمة المرور</string>
+    <string name="ok">تم</string>
+    <string name="add_title">اضف عنوان</string>
+
+    <!--        <string name="quote_banner_id">ca-app-pub-3940256099942544/6300978111</string>-->
+    <string name="color_dialog_banner_id">ca-app-pub-7003859395474560/9623239116</string>
+    <string name="delete_dialog_banner_id">ca-app-pub-7003859395474560/4982174573</string>
+    <string name="add_note_banner_id">ca-app-pub-7003859395474560/4962186792</string>
+    <string name="quote_banner_id">ca-app-pub-7003859395474560/9526217956</string>
+</resources>

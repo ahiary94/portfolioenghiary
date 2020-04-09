@@ -61,7 +61,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="color" value="000000" />
+                                                <entry key="color" value="ffffff" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -72,7 +72,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="fontFamily" value="Traditional Arabic" />
+                                                <entry key="fontFamily" value="Chocolate Bar Demo" />
                                                 <entry key="text" value="VN" />
                                               </map>
                                             </option>
@@ -84,10 +84,8 @@
                                   <option name="values">
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
-                                      <entry key="backgroundColor" value="cf2800" />
-                                      <entry key="backgroundLayerName" value="note_background" />
+                                      <entry key="backgroundColor" value="d35809" />
                                       <entry key="foregroundAssetType" value="TEXT" />
-                                      <entry key="foregroundLayerName" value="note_foreground" />
                                       <entry key="outputName" value="voice_note_icon_lanchur" />
                                     </map>
                                   </option>

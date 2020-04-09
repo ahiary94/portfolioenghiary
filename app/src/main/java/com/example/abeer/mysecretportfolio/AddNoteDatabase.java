@@ -21,7 +21,7 @@ import androidx.annotation.Nullable;
 public class AddNoteDatabase extends SQLiteOpenHelper {
 
     private static final String NOTE_DB_NAME = "myNoteAppDB";
-    private static final int NOTE_DB_VERSION = 8;
+    private static final int NOTE_DB_VERSION = 1;//last before push to store is 8
 
     private String NOTES_TABLE = "notes_table";
 
@@ -109,7 +109,7 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("ALTER TABLE " + NOTES_TABLE + " ADD COLUMN " + NOTES_DATE + " TEXT");
+//        db.execSQL("ALTER TABLE " + NOTES_TABLE + " ADD COLUMN " + NOTES_DATE + " TEXT");
 //        db.execSQL("UPDATE " + NOTES_TABLE + " SET " + NOTES_DATE + " = 4/7/2020");
 //        db.execSQL("ALTER TABLE " + PASSWORD_TABLE + " ADD COLUMN " + PASSWORD + " VARCHAR");
 //        db.execSQL("CREATE TABLE IF NOT EXISTS " + QUOTE_TABLE + "("

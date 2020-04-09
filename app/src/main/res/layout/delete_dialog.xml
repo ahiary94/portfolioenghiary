@@ -14,7 +14,7 @@
         android:drawableLeft="@drawable/ic_delete_black_24dp"
         android:fontFamily="casual"
         android:textSize="18sp"
-        android:text="Delete" />
+        android:text="@string/delete" />
 
     <TextView
         android:layout_width="match_parent"
@@ -22,7 +22,7 @@
         android:layout_marginLeft="25dp"
         android:layout_marginTop="10dp"
         android:fontFamily="casual"
-        android:text="Are you want delete this note ?" />
+        android:text="@string/are_you_want_delete_this_note" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -37,7 +37,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="casual"
-            android:text="Cancel"
+            android:text="@string/cancel"
             android:textColor="@color/redf" />
 
         <TextView
@@ -48,7 +48,7 @@
             android:layout_marginLeft="15dp"
             android:layout_marginRight="20dp"
             android:fontFamily="casual"
-            android:text="Yes" />
+            android:text="@string/yes" />
 
     </LinearLayout>
 

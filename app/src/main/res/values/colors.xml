@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#FC4929</color>
-    <color name="colorPrimaryDark">#D6341B</color>
-    <color name="colorAccent">#D6341B</color>//ffbd90
+    <color name="colorPrimary">#FD5A16</color>
+    <color name="colorPrimaryDark">#DD4D11</color>
+    <color name="colorAccent">#DD4D11</color>//ffbd90
 
-<!--    <color name="colorPrimary">#9c5d67</color>-->
-<!--    <color name="colorPrimaryDark">#784950</color>-->
-<!--    <color name="colorAccent">#784950</color>//ffbd90-->
+    <!--    <color name="colorPrimary">#fde9cdae</color>-->
+    <!--    <color name="colorPrimary">#9c5d67</color>-->
+    <!--    <color name="colorPrimaryDark">#784950</color>-->
+    <!--    <color name="colorAccent">#784950</color>//ffbd90-->
 
     <color name="lightPink">#FAF2F2</color>
 
@@ -24,8 +25,6 @@
 
     <color name="colorList">#B8B6B6</color>
 
-    <!--    <color name="colorPrimary">#fde9cdae</color>-->
-
 
 
     <color name="grayf">#ABFFFFFF</color>
@@ -35,7 +34,7 @@
     <color name="redf">#FC2828</color>
     <color name="yellowf">#DDFF00</color>
     <color name="gray_darkf">#4B4A4A</color>
-<!--    <color name="gray_darkf">#27274B</color>-->
+    <!--    <color name="gray_darkf">#27274B</color>-->
     <color name="dark_bluef">#13133D</color>
     <color name="alpha_grayf">#8D000000</color>
 

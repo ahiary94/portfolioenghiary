@@ -1,11 +1,5 @@
 <resources>
-    <string name="app_name">MySecretPortfolio</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
-    <string name="portfolio">Notes</string>
-
+    <string name="app_name">Notes</string>
     <string name="open">Open</string>
     <string name="close">Close</string>
 
@@ -24,15 +18,24 @@
     <string name="favourite">Add to favourite</string>
     <string name="lock">Lock to taskbar</string>
     <string name="secret">Secret</string>
-    <string name="delete">Delete</string>
 
     <string name="voice_note">voice Note</string>
-<!--        <string name="quote_banner_id">ca-app-pub-3940256099942544/6300978111</string>-->
+    <string name="hint_title">Title...</string>
+    <string name="delete">Delete</string>
+    <string name="are_you_want_delete_this_note">Are you want delete this note ?</string>
+    <string name="cancel">Cancel</string>
+    <string name="yes">Yes</string>
+    <string name="note">Note</string>
+    <string name="password">Password</string>
+    <string name="ok">Ok</string>
+    <string name="add_title">Add title</string>
 
+<!--        <string name="quote_banner_id">ca-app-pub-3940256099942544/6300978111</string>-->
     <string name="color_dialog_banner_id">ca-app-pub-7003859395474560/9623239116</string>
     <string name="delete_dialog_banner_id">ca-app-pub-7003859395474560/4982174573</string>
     <string name="add_note_banner_id">ca-app-pub-7003859395474560/4962186792</string>
     <string name="quote_banner_id">ca-app-pub-7003859395474560/9526217956</string>
+
 
 
 </resources>
