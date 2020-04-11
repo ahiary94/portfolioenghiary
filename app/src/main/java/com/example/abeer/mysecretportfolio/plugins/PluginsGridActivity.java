@@ -12,7 +12,6 @@ import com.example.abeer.mysecretportfolio.AddNoteDatabase;
 import com.example.abeer.mysecretportfolio.MainActivity;
 import com.example.abeer.mysecretportfolio.R;
 import com.example.abeer.mysecretportfolio.models.AddNoteModel;
-import com.example.abeer.mysecretportfolio.models.FavouriteModel;
 import com.example.abeer.mysecretportfolio.models.HomeModel;
 
 import java.util.ArrayList;
@@ -78,7 +77,7 @@ public class PluginsGridActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Toast.makeText(PluginsGridActivity.this, "The note is deleted", Toast.LENGTH_SHORT).show();
-                database.clearNote(id);
+                database.updateDeleteFlag(id);
                 notifyAdapter();
             }
         });

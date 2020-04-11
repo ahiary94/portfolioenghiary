@@ -21,8 +21,9 @@ import androidx.annotation.Nullable;
 public class AddNoteDatabase extends SQLiteOpenHelper {
 
     private static final String NOTE_DB_NAME = "myNoteAppDB";
-    private static final int NOTE_DB_VERSION = 1;//last before push to store is 8
+    private static final int NOTE_DB_VERSION = 10;//last before push to store is 8
 
+    // **********************************************************
     private String NOTES_TABLE = "notes_table";
 
     private String NOTES_ID = "note_id";
@@ -30,7 +31,8 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
     private String NOTES_NOTE = "note";
     private String NOTES_COLOR = "color";
     private String NOTES_FLAG = "flag";// 0 => hand note , 1 => voice note
-    private String NOTES_DATE = "date";// 0 => hand note , 1 => voice note
+    private String NOTES_DATE = "date";//
+    private String NOTES_DELETE_FLAG = "delete_flag";// 0 => visible, 1 => not visible
 
     // **********************************************************
     private String PLUGINS_TABLE = "plugins_table";
@@ -40,6 +42,7 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
     private String PLUGINS_FAVORITE = "favorite";
     private String PLUGINS_LOCK = "lock";
     private String PLUGINS_SECRET = "secret";
+    private String PLUGINS_DELETE_FLAG = "p_delete_flag";// 0 => visible, 1 => not visible
 
     // **********************************************************
     private String PASSWORD_TABLE = "password_table";
@@ -80,7 +83,8 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
                 + NOTES_NOTE + " VARCHAR,"
                 + NOTES_COLOR + " VARCHAR,"
                 + NOTES_FLAG + " INTEGER,"
-                + NOTES_DATE + " TEXT"
+                + NOTES_DATE + " TEXT,"
+                + NOTES_DELETE_FLAG + " INTEGER"
                 + ");";
 
         String sqlQuery2 = "CREATE TABLE IF NOT EXISTS " + PLUGINS_TABLE + "("
@@ -88,7 +92,9 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
                 + PLUGINS_RID + " INTEGER,"
                 + PLUGINS_FAVORITE + " INTEGER,"
                 + PLUGINS_LOCK + " INTEGER,"
-                + PLUGINS_SECRET + " INTEGER,FOREIGN KEY(" + PLUGINS_RID + ") REFERENCES tableOfMyNote(" + NOTES_ID + "));";
+                + PLUGINS_SECRET + " INTEGER,"
+                + PLUGINS_DELETE_FLAG + " INTEGER,"
+                +"FOREIGN KEY(" + PLUGINS_RID + ") REFERENCES tableOfMyNote(" + NOTES_ID + "));";
 
         String sqlQuery3 = "CREATE TABLE IF NOT EXISTS " + PASSWORD_TABLE + "("
                 + PASSWORD + " VARCHAR);";
@@ -109,7 +115,12 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-//        db.execSQL("ALTER TABLE " + NOTES_TABLE + " ADD COLUMN " + NOTES_DATE + " TEXT");
+        db.execSQL("ALTER TABLE " + NOTES_TABLE + " ADD COLUMN " + NOTES_DELETE_FLAG + " INTEGER");
+        db.execSQL("UPDATE " + NOTES_TABLE + " SET " + NOTES_DELETE_FLAG + " = 0");
+
+        db.execSQL("ALTER TABLE " + PLUGINS_TABLE + " ADD COLUMN " + PLUGINS_DELETE_FLAG + " INTEGER");
+        db.execSQL("UPDATE " + PLUGINS_TABLE + " SET " + PLUGINS_DELETE_FLAG + " = 0");
+        //        db.execSQL("ALTER TABLE " + NOTES_TABLE + " ADD COLUMN " + NOTES_DATE + " TEXT");
 //        db.execSQL("UPDATE " + NOTES_TABLE + " SET " + NOTES_DATE + " = 4/7/2020");
 //        db.execSQL("ALTER TABLE " + PASSWORD_TABLE + " ADD COLUMN " + PASSWORD + " VARCHAR");
 //        db.execSQL("CREATE TABLE IF NOT EXISTS " + QUOTE_TABLE + "("
@@ -124,6 +135,8 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
         onCreate(db);
 
     }
+
+    //------------------------------------- ADD -----------------------------
 
     public void addImageQuote(byte[] image) throws SQLiteException {
         SQLiteDatabase database = getWritableDatabase();
@@ -140,6 +153,7 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
         contentValues.put(NOTES_COLOR, color);
         contentValues.put(NOTES_FLAG, flag);
         contentValues.put(NOTES_DATE, date);
+        contentValues.put(NOTES_DELETE_FLAG, 0);
 
         database.insert(NOTES_TABLE, null, contentValues);
         return true;
@@ -152,6 +166,7 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
         contentValues.put(PLUGINS_FAVORITE, favourite);
         contentValues.put(PLUGINS_LOCK, lock);
         contentValues.put(PLUGINS_SECRET, secret);
+        contentValues.put(PLUGINS_DELETE_FLAG, 0);
 
         database.insert(PLUGINS_TABLE, null, contentValues);
         return true;
@@ -219,6 +234,42 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
 
     }
 
+    public void updateAllDatabase() {
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(NOTES_DELETE_FLAG, 1);
+        database.update(NOTES_TABLE, contentValues, null, null);
+
+        ContentValues contentValues2 = new ContentValues();
+        contentValues2.put(PLUGINS_DELETE_FLAG, 1);
+        database.update(PLUGINS_TABLE, contentValues2, null, null);
+
+    }
+
+    public void updateDeleteFlag(int id) {
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(NOTES_DELETE_FLAG, 1);
+        database.update(NOTES_TABLE, contentValues, NOTES_ID+ " = ?", new String[]{String.valueOf(id)});
+
+        ContentValues contentValues2 = new ContentValues();
+        contentValues2.put(PLUGINS_DELETE_FLAG, 1);
+        database.update(PLUGINS_TABLE, contentValues2, PLUGINS_RID+ " = ?", new String[]{String.valueOf(id)});
+
+    }
+
+    public void updateDeleteFlagZero(int id) {
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(NOTES_DELETE_FLAG, 0);
+        database.update(NOTES_TABLE, contentValues, NOTES_ID+ " = ?", new String[]{String.valueOf(id)});
+
+        ContentValues contentValues2 = new ContentValues();
+        contentValues2.put(PLUGINS_DELETE_FLAG, 0);
+        database.update(PLUGINS_TABLE, contentValues2, PLUGINS_RID+ " = ?", new String[]{String.valueOf(id)});
+
+    }
+
     public void clearNote(int id) {
         SQLiteDatabase database = this.getWritableDatabase();
         database.delete(NOTES_TABLE, NOTES_ID + " = ?", new String[]{String.valueOf(id)});
@@ -247,14 +298,14 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
                 bitmapList.add(BitmapFactory.decodeByteArray(image, 0, image.length));
 
             } while (cursor.moveToNext());
-            database.endTransaction();
+        database.endTransaction();
         return bitmapList;
     }
 
     public List<HomeModel> selectAllContent() {
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT note_id,title,note,color,plugin_rid,favorite,lock,secret,flag,date FROM notes_table,plugins_table WHERE \n" +
-                "note_id == plugin_rid AND secret = 0";
+        String query = "SELECT note_id,title,note,color,plugin_rid,favorite,lock,secret,flag,date,delete_flag,p_delete_flag FROM notes_table,plugins_table WHERE \n" +
+                "note_id == plugin_rid AND secret = 0 AND delete_flag = 0 AND p_delete_flag = 0";
         Cursor cursor = db.rawQuery(query, null);
         List<HomeModel> list = new ArrayList<>();
         if (cursor.moveToFirst())
@@ -294,8 +345,8 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
 
     public List<HomeModel> selectSecretContent() {
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT note_id,title,note,color,secret,date FROM notes_table,plugins_table WHERE \n" +
-                "note_id == plugin_rid AND secret = 1";
+        String query = "SELECT note_id,title,note,color,secret,date,delete_flag,p_delete_flag FROM notes_table,plugins_table WHERE \n" +
+                "note_id == plugin_rid AND secret = 1 AND delete_flag = 0 AND p_delete_flag = 0";
         Cursor cursor = db.rawQuery(query, null);
         List<HomeModel> list = new ArrayList<>();
         if (cursor.moveToFirst())
@@ -317,8 +368,8 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
 
     public List<HomeModel> selectFavouriteContent() {
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT note_id,title,note,color,date FROM notes_table,plugins_table WHERE \n" +
-                "note_id == plugin_rid AND favorite = 1";
+        String query = "SELECT note_id,title,note,color,date,delete_flag,p_delete_flag FROM notes_table,plugins_table WHERE \n" +
+                "note_id == plugin_rid AND favorite = 1 AND delete_flag = 0 AND p_delete_flag = 0";
         Cursor cursor = db.rawQuery(query, null);
         List<HomeModel> list = new ArrayList<>();
         if (cursor.moveToFirst())
@@ -371,10 +422,50 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
 
     }
 
+    public List<HomeModel> selectAllDeleted() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT note_id,title,note,color,plugin_rid,favorite,lock,secret,flag,date,delete_flag,p_delete_flag FROM notes_table,plugins_table WHERE \n" +
+                "note_id == plugin_rid AND delete_flag = 1 AND p_delete_flag = 1 AND flag = 0";
+        Cursor cursor = db.rawQuery(query, null);
+        List<HomeModel> list = new ArrayList<>();
+        if (cursor.moveToFirst())
+            do {
+                HomeModel model = new HomeModel();
+                model.setId(cursor.getInt(0));
+                model.setTitle(cursor.getString(1));
+                model.setNote(cursor.getString(2));
+                model.setColor(Integer.parseInt(cursor.getString(3)));
+                model.setPluginId(cursor.getInt(4));
+                model.setFavorite(cursor.getInt(5));
+                model.setPinToTaskbar(cursor.getInt(6));
+                model.setSecret(cursor.getInt(7));
+                model.setNoteFlag(cursor.getInt(8));
+                model.setDate(cursor.getString(9));
+
+                list.add(model);
+            } while (cursor.moveToNext());
+
+//        if (c.moveToFirst()){
+//            do {
+//                // Passing values
+//                String column1 = c.getString(0);
+//                Log.e("Title", column1);
+//                String column2 = c.getString(1);
+//                Log.e("not", column2);
+//                String column3 = c.getString(2);
+//                Log.e("color", column3);
+//            } while(c.moveToNext());
+//        }
+//        c.close();
+//        db.close();
+        return list;
+    }
+
+
     ////////////////////////////////////////////////////////////////////////////////////////// down error
     public Cursor selectSpecificPluginsContent(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT plugin_rid,favorite,lock,secret FROM plugins_table WHERE plugin_rid=?";
+        String query = "SELECT plugin_rid,favorite,lock,secret,p_delete_flag FROM plugins_table WHERE plugin_rid=? AND p_delete_flag = 0";
         Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(id)});
         return cursor;
     }
@@ -386,5 +477,11 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
         return c;
     }
 
+    public Cursor selectQuotesSize() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM quote_table";
+        Cursor c = db.rawQuery(query, null);
+        return c;
+    }
 
 }

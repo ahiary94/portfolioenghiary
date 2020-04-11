@@ -41,7 +41,6 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -97,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Runnable runnable;
     private Handler handler;
     public static final String ACTIVITY_SOURCE = "SOURCE";
-//    private Calendar calendar;
+    //    private Calendar calendar;
     private Date date;
     private SimpleDateFormat dateFormat;
     private String noteTime = "";
@@ -236,6 +235,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         if (item.getItemId() == R.id.add_note_btn) {
             Intent intent = new Intent(MainActivity.this, AddNoteActivity.class);
+            intent.putExtra(ACTIVITY_SOURCE, 1);
+            AddNoteModel.bit = 4;// just for main
             startActivity(intent);
         } else if (item.getItemId() == R.id.add_note_voice_message) {
 
@@ -459,7 +460,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                database.clearNote(id);
+                database.updateDeleteFlag(id);
                 showSnackbar("The note is deleted", R.drawable.ic_check);
                 notifyAdapter();
             }
@@ -499,7 +500,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            database.clearDatabase();
+                            database.updateAllDatabase();
                             showSnackbar("Deleted Successfully", R.drawable.ic_check);
                             notifyAdapter();
                         }
@@ -587,6 +588,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 });
                 builder1.show();
+                break;
+            case R.id.plugins_trash_can:
+                Intent intent2 = new Intent(MainActivity.this, TrashCanActivity.class);
+                startActivity(intent2);
+
+                break;
 
         }
         return true;

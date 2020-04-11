@@ -30,6 +30,7 @@
     <string name="password">كلمة المرور</string>
     <string name="ok">تم</string>
     <string name="add_title">اضف عنوان</string>
+    <string name="trash_can">سلة المحذوفات</string>
 
     <!--        <string name="quote_banner_id">ca-app-pub-3940256099942544/6300978111</string>-->
     <string name="color_dialog_banner_id">ca-app-pub-7003859395474560/9623239116</string>

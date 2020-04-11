@@ -2,7 +2,6 @@ package com.example.abeer.mysecretportfolio;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -21,7 +20,6 @@ import com.example.abeer.mysecretportfolio.models.AddNoteModel;
 import com.example.abeer.mysecretportfolio.models.HomeModel;
 import com.example.abeer.mysecretportfolio.plugins.PluginsGridActivity;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
@@ -31,7 +29,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -56,6 +53,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
     private Date date;
     private SimpleDateFormat dateFormat;
     private String noteTime = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,7 +112,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
 //        itemLock.setCheckable(true);
         itemSecret.setCheckable(true);
 
-        if (AddNoteModel.bit == 1) {
+        if (AddNoteModel.bit == 1 || AddNoteModel.bit == 4) {// from edit or main to add new
             receiveIntentInformation();
         }
         return true;
@@ -247,9 +245,10 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
             }
 
             AddNoteModel.bit = 0;
-            Log.e("source", ""+sourceActivity);
+            Log.e("source", "" + sourceActivity);
             switch (sourceActivity) {
-                case 1:// main
+                case 1:// edit from main
+                case 4:// new from main
                     Intent goToHome = new Intent(AddNoteActivity.this, MainActivity.class);
                     startActivity(goToHome);
                     finish();
@@ -322,7 +321,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onClick(View view) {
                 Toast.makeText(AddNoteActivity.this, "The note is deleted", Toast.LENGTH_SHORT).show();
-                addNoteDatabase.clearNote(id);
+                addNoteDatabase.updateDeleteFlag(id);
                 AddNoteModel.bit = 0;
                 Intent goToHome = new Intent(AddNoteActivity.this, MainActivity.class);
                 startActivity(goToHome);
@@ -347,31 +346,35 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
 
         sourceActivity = getIntent().getIntExtra(ACTIVITY_SOURCE, 1);
         Log.e("source", "" + sourceActivity);
-        Bundle bundle = getIntent().getExtras();
-        HomeModel model = (HomeModel) bundle.getSerializable("model");
-        id = model.getId();
-        this.model.setId(model.getId());
-        this.model.setTitle(model.getTitle());
-        this.model.setNote(model.getNote());
-        this.model.setColor(String.valueOf(model.getColor()));
-        this.model.setPluginsID(model.getPluginId());
-        this.model.setFavourite(model.getFavorite());
-        this.model.setLock(model.getPinToTaskbar());
-        this.model.setSecret(model.getSecret());
+        if (AddNoteModel.bit == 1) {
+            Bundle bundle = getIntent().getExtras();
+            HomeModel model = (HomeModel) bundle.getSerializable("model");
+            id = model.getId();
+            this.model.setId(model.getId());
+            this.model.setTitle(model.getTitle());
+            this.model.setNote(model.getNote());
+            this.model.setColor(String.valueOf(model.getColor()));
+            this.model.setPluginsID(model.getPluginId());
+            this.model.setFavourite(model.getFavorite());
+            this.model.setLock(model.getPinToTaskbar());
+            this.model.setSecret(model.getSecret());
 
 //        Log.e("favorite state ", "" + this.model.getFavourite());
-        titleEditText.setText(model.getTitle());
-        writeNote.setText(model.getNote());
-        writeNote.setBackgroundResource(model.getColor());
-        if (this.model.getFavourite() == 1) {
+            titleEditText.setText(model.getTitle());
+            writeNote.setText(model.getNote());
+            writeNote.setBackgroundResource(model.getColor());
+            if (this.model.getFavourite() == 1) {
 //            Log.e("favorite received", "1");
-            itemFavorite.setChecked(true);
-        }
-        if (this.model.getLock() == 1) {
+                itemFavorite.setChecked(true);
+            }
+            if (this.model.getLock() == 1) {
 //            itemLock.setChecked(true);
-        }
-        if (this.model.getSecret() == 1) {
-            itemSecret.setChecked(true);
+            }
+            if (this.model.getSecret() == 1) {
+                itemSecret.setChecked(true);
+            }
+        } else {
+            AddNoteModel.bit = 0;
         }
 
     }

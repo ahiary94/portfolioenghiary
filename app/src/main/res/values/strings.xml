@@ -30,12 +30,12 @@
     <string name="ok">Ok</string>
     <string name="add_title">Add title</string>
 
-<!--        <string name="quote_banner_id">ca-app-pub-3940256099942544/6300978111</string>-->
+    <!--        <string name="quote_banner_id">ca-app-pub-3940256099942544/6300978111</string>-->
     <string name="color_dialog_banner_id">ca-app-pub-7003859395474560/9623239116</string>
     <string name="delete_dialog_banner_id">ca-app-pub-7003859395474560/4982174573</string>
     <string name="add_note_banner_id">ca-app-pub-7003859395474560/4962186792</string>
     <string name="quote_banner_id">ca-app-pub-7003859395474560/9526217956</string>
-
+    <string name="trash_can">Trash Can</string>
 
 
 </resources>

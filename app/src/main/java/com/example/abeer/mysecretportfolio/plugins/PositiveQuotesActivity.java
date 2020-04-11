@@ -1,5 +1,6 @@
 package com.example.abeer.mysecretportfolio.plugins;
 
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -10,7 +11,6 @@ import android.view.MenuItem;
 import com.example.abeer.mysecretportfolio.AddNoteDatabase;
 import com.example.abeer.mysecretportfolio.R;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 
 import java.io.ByteArrayOutputStream;
@@ -34,6 +34,7 @@ public class PositiveQuotesActivity extends AppCompatActivity {
     private AdRequest adRequest;
     private static final int ITEM_PER_AD = 5;
     private static final int AD_HIGHT = 150;
+    private int count;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +53,41 @@ public class PositiveQuotesActivity extends AppCompatActivity {
 //        adView.setAdSize(AdSize.BANNER);
         adView.loadAd(adRequest);
 
+        Cursor cursor = database.selectQuotesSize();
+        cursor.moveToFirst();
+        count = cursor.getInt(0);
+        Log.e("returned id", "" + count);
+        cursor.close();
+        if (count == 0) {
+            pushQuoteIntoDB(R.drawable.q1);
+            pushQuoteIntoDB(R.drawable.q2);
+            pushQuoteIntoDB(R.drawable.q3);
+            pushQuoteIntoDB(R.drawable.q4);
+            pushQuoteIntoDB(R.drawable.q5);
+            pushQuoteIntoDB(R.drawable.q6);
+            pushQuoteIntoDB(R.drawable.q7);
+            pushQuoteIntoDB(R.drawable.q8);
+            pushQuoteIntoDB(R.drawable.q9);
+            pushQuoteIntoDB(R.drawable.q10);
+            pushQuoteIntoDB(R.drawable.q11);
+            pushQuoteIntoDB(R.drawable.q12);
+            pushQuoteIntoDB(R.drawable.q13);
+            pushQuoteIntoDB(R.drawable.q14);
+            pushQuoteIntoDB(R.drawable.q15);
+            pushQuoteIntoDB(R.drawable.q16);
+            pushQuoteIntoDB(R.drawable.q17);
+            pushQuoteIntoDB(R.drawable.q18);
+            pushQuoteIntoDB(R.drawable.q19);
+            pushQuoteIntoDB(R.drawable.q20);
+            pushQuoteIntoDB(R.drawable.q21);
+            pushQuoteIntoDB(R.drawable.q22);
+            pushQuoteIntoDB(R.drawable.q23);
+            pushQuoteIntoDB(R.drawable.q24);
+            pushQuoteIntoDB(R.drawable.q25);
+            pushQuoteIntoDB(R.drawable.q26);
+            pushQuoteIntoDB(R.drawable.q27);
+        }
+
         new FetchImages().execute();
     }
 
@@ -66,6 +102,7 @@ public class PositiveQuotesActivity extends AppCompatActivity {
         bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
         return stream.toByteArray();
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
