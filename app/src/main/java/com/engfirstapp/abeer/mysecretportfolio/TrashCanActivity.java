@@ -1,4 +1,4 @@
-package com.example.abeer.mysecretportfolio;
+package com.engfirstapp.abeer.mysecretportfolio;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,7 +13,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.example.abeer.mysecretportfolio.models.HomeModel;
+import com.engfirstapp.abeer.mysecretportfolio.models.HomeModel;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;

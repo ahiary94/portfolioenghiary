@@ -1,4 +1,4 @@
-package com.example.abeer.mysecretportfolio;
+package com.engfirstapp.abeer.mysecretportfolio;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -16,9 +16,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.abeer.mysecretportfolio.models.AddNoteModel;
-import com.example.abeer.mysecretportfolio.models.HomeModel;
-import com.example.abeer.mysecretportfolio.plugins.PluginsGridActivity;
+import com.engfirstapp.abeer.mysecretportfolio.models.AddNoteModel;
+import com.engfirstapp.abeer.mysecretportfolio.models.HomeModel;
+import com.engfirstapp.abeer.mysecretportfolio.plugins.PluginsGridActivity;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
@@ -32,7 +32,7 @@ import java.util.Date;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import static com.example.abeer.mysecretportfolio.MainActivity.ACTIVITY_SOURCE;
+import static com.engfirstapp.abeer.mysecretportfolio.MainActivity.ACTIVITY_SOURCE;
 
 public class AddNoteActivity extends AppCompatActivity implements View.OnClickListener {
 

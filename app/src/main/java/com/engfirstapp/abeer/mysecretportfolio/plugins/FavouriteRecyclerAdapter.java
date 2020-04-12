@@ -1,4 +1,4 @@
-package com.example.abeer.mysecretportfolio.plugins;
+package com.engfirstapp.abeer.mysecretportfolio.plugins;
 
 import android.database.Cursor;
 import android.util.Log;
@@ -8,10 +8,9 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.example.abeer.mysecretportfolio.AddNoteDatabase;
-import com.example.abeer.mysecretportfolio.R;
-import com.example.abeer.mysecretportfolio.models.FavouriteModel;
-import com.example.abeer.mysecretportfolio.models.HomeModel;
+import com.engfirstapp.abeer.mysecretportfolio.AddNoteDatabase;
+import com.engfirstapp.abeer.mysecretportfolio.R;
+import com.engfirstapp.abeer.mysecretportfolio.models.HomeModel;
 
 import java.util.List;
 

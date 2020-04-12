@@ -1,8 +1,6 @@
-package com.example.abeer.mysecretportfolio;
+package com.engfirstapp.abeer.mysecretportfolio;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -10,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.abeer.mysecretportfolio.models.HomeModel;
+import com.engfirstapp.abeer.mysecretportfolio.models.HomeModel;
 
 import java.util.List;
 

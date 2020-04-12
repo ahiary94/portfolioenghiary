@@ -1,4 +1,4 @@
-package com.example.abeer.mysecretportfolio.models;
+package com.engfirstapp.abeer.mysecretportfolio.models;
 
 import java.io.Serializable;
 

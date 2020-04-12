@@ -1,5 +1,6 @@
-package com.example.abeer.mysecretportfolio.plugins;
+package com.engfirstapp.abeer.mysecretportfolio.plugins;
 
+import android.app.ProgressDialog;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,8 +9,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
-import com.example.abeer.mysecretportfolio.AddNoteDatabase;
-import com.example.abeer.mysecretportfolio.R;
+import com.engfirstapp.abeer.mysecretportfolio.AddNoteDatabase;
+import com.engfirstapp.abeer.mysecretportfolio.R;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
@@ -35,6 +36,7 @@ public class PositiveQuotesActivity extends AppCompatActivity {
     private static final int ITEM_PER_AD = 5;
     private static final int AD_HIGHT = 150;
     private int count;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +47,9 @@ public class PositiveQuotesActivity extends AppCompatActivity {
         gridView = findViewById(R.id.recyclerView_possitive_quotes);
         toolbar = findViewById(R.id.general_toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true); //
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Pleases waiting...");
 
         adView = findViewById(R.id.positive_ad);
         adRequest = new AdRequest.Builder().build();
@@ -114,6 +118,13 @@ public class PositiveQuotesActivity extends AppCompatActivity {
     }
 
     class FetchImages extends AsyncTask<String, String, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog.show();
+        }
+
         @Override
         protected String doInBackground(String... strings) {
             bitmapList = database.getImage();
@@ -127,6 +138,7 @@ public class PositiveQuotesActivity extends AppCompatActivity {
             Log.e("size1", "" + bitmapList.size());
             gridView.setLayoutManager(new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL));
             gridView.setAdapter(adapter);
+            progressDialog.dismiss();
         }
     }
 

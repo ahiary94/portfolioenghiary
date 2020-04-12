@@ -1,4 +1,4 @@
-package com.example.abeer.mysecretportfolio.plugins;
+package com.engfirstapp.abeer.mysecretportfolio.plugins;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -9,7 +9,7 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.abeer.mysecretportfolio.R;
+import com.engfirstapp.abeer.mysecretportfolio.R;
 
 import java.util.List;
 
@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class PositiveAdapter extends RecyclerView.Adapter<PositiveAdapter.ViewHolderLocal> {
 
-    //    private List<PositiveQuoteModel> list;
     private Context mContext;
     private List<Bitmap> bitmapList;
 

@@ -1,9 +1,9 @@
-package com.example.abeer.mysecretportfolio.plugins;
+package com.engfirstapp.abeer.mysecretportfolio.plugins;
 
 import android.os.Bundle;
 import android.view.MenuItem;
 
-import com.example.abeer.mysecretportfolio.R;
+import com.engfirstapp.abeer.mysecretportfolio.R;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;

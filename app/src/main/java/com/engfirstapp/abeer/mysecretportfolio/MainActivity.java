@@ -1,4 +1,4 @@
-package com.example.abeer.mysecretportfolio;
+package com.engfirstapp.abeer.mysecretportfolio;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -27,16 +27,17 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.abeer.mysecretportfolio.models.AddNoteModel;
-import com.example.abeer.mysecretportfolio.models.HomeModel;
-import com.example.abeer.mysecretportfolio.plugins.CalenderActivity;
-import com.example.abeer.mysecretportfolio.plugins.PluginsGridActivity;
-import com.example.abeer.mysecretportfolio.plugins.PositiveQuotesActivity;
+import com.engfirstapp.abeer.mysecretportfolio.models.AddNoteModel;
+import com.engfirstapp.abeer.mysecretportfolio.models.HomeModel;
+import com.engfirstapp.abeer.mysecretportfolio.plugins.CalenderActivity;
+import com.engfirstapp.abeer.mysecretportfolio.plugins.PluginsGridActivity;
+import com.engfirstapp.abeer.mysecretportfolio.plugins.PositiveQuotesActivity;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -80,9 +81,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private MediaPlayer mediaPlayer;
     private String fileName = "";
     private int randomNo, noteFlag = 1;
-    private Button deleteRecord, closeDialog, okSecretPassword;
-    private EditText secretPassword, recordTitle;
-    private TextView passwordDialogTitle;
+    private Button deleteRecord, closeDialog, okSecretPassword, okEdit;
+    private EditText secretPassword, recordTitle, oldPassword, newPassword;
+    private TextView passwordDialogTitle, showEditLinear;
     private boolean isStartRecording = false;
     //    private static final int THREAD_ID = 10000;
     private static final int REQUEST_PERMISSION_CODE = 10000;
@@ -100,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Date date;
     private SimpleDateFormat dateFormat;
     private String noteTime = "";
+    private LinearLayout linearPassword, linearEdit;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -109,13 +111,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 //        TrafficStats.setThreadStatsTag(THREAD_ID);
 //        calendar = Calendar.getInstance();
+        database = new AddNoteDatabase(this);
         date = Calendar.getInstance().getTime();
         dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         noteTime = dateFormat.format(date);
 //        Log.e("date", noteTime);
 
         activity = this;
-        database = new AddNoteDatabase(this);
         coordinator = findViewById(R.id.main_coordinator);
         toolbar = findViewById(R.id.general_toolbar);
         drawerLayout = findViewById(R.id.main_drawer_layout);
@@ -149,6 +151,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         pd = new ProgressDialog(this);
         pd.setMessage("Please waiting...");
         pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+
 
     }
 
@@ -489,7 +492,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Log.e("cal", "calender");
         switch (item.getItemId()) {
             case R.id.plugins_calender:
-                drawerLayout.closeDrawer(Gravity.LEFT);
+                drawerLayout.closeDrawer(Gravity.START);
                 Intent calenderIntent = new Intent(MainActivity.this, CalenderActivity.class);
                 startActivity(calenderIntent);
                 break;
@@ -521,15 +524,60 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 final Dialog dialog = new Dialog(this);
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setContentView(R.layout.secret_password_dialog);
+                Log.e("password", password + password.equals(""));
 
                 passwordDialogTitle = dialog.findViewById(R.id.passwordDialog_title);
                 secretPassword = dialog.findViewById(R.id.passwordDialog_password);
                 okSecretPassword = dialog.findViewById(R.id.passwordDialog_ok);
+                linearPassword = dialog.findViewById(R.id.passwordDialog_linearOne);
+                linearEdit = dialog.findViewById(R.id.passwordDialog_linrear_edit);
+                linearPassword.setVisibility(View.VISIBLE);
+                linearEdit.setVisibility(View.GONE);
+                showEditLinear = dialog.findViewById(R.id.passwordDialog_edit_tv);
+                okEdit = dialog.findViewById(R.id.passwordDialog_edit_ok);
+                oldPassword = dialog.findViewById(R.id.passwordDialog_edit_oldPassword);
+                newPassword = dialog.findViewById(R.id.passwordDialog_edit_newPassword);
+
+                if (password.equals(""))  // for the first time
+                    passwordDialogTitle.setText(getResources().getString(R.string.add_your_password));
+                else
+                    passwordDialogTitle.setText(getResources().getString(R.string.password));
+
+                okEdit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (!TextUtils.isEmpty(password)) {
+                            if (!TextUtils.isEmpty(oldPassword.getText().toString()) && !TextUtils.isEmpty(newPassword.getText().toString())) {
+                                if (oldPassword.getText().toString().equals(password)){
+                                    database.updateSecretPassword(newPassword.getText().toString());
+                                    dialog.dismiss();
+                                    showSnackbar("Your password edited successfully", R.drawable.ic_check);
+                                }else
+                                    Toast.makeText(activity, "Your password is wrong!", Toast.LENGTH_SHORT).show();
+                            } else
+                                Toast.makeText(activity, "Please fill passwords first!", Toast.LENGTH_SHORT).show();
+                        } else
+                            Toast.makeText(activity, "you don't have password, add password to enable editing!", Toast.LENGTH_LONG).show();
+                    }
+                });
+
+                showEditLinear.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (linearPassword.getVisibility() == View.VISIBLE && (linearEdit.getVisibility() == View.GONE)) {
+                            linearPassword.setVisibility(View.GONE);
+                            linearEdit.setVisibility(View.VISIBLE);
+                        } else {
+                            linearPassword.setVisibility(View.VISIBLE);
+                            linearEdit.setVisibility(View.GONE);
+                        }
+                    }
+                });
+
                 okSecretPassword.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         if (password.equals("")) { // for the first time
-                            passwordDialogTitle.setText("Add your password");
                             if (!TextUtils.isEmpty(secretPassword.getText().toString())) {
                                 database.addSecretPassword(secretPassword.getText().toString());
                                 Toast.makeText(MainActivity.this, "Password Added Successfully", Toast.LENGTH_SHORT).show();
@@ -540,7 +588,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             } else
                                 Toast.makeText(MainActivity.this, "Please add password first!", Toast.LENGTH_SHORT).show();
                         } else {
-                            passwordDialogTitle.setText("Password");
                             if (!TextUtils.isEmpty(secretPassword.getText().toString())) {
                                 if (secretPassword.getText().toString().equals(password)) {
                                     Toast.makeText(MainActivity.this, "Password Added Successfully", Toast.LENGTH_SHORT).show();

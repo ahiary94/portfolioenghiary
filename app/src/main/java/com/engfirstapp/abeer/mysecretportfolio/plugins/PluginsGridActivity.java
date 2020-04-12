@@ -1,4 +1,4 @@
-package com.example.abeer.mysecretportfolio.plugins;
+package com.engfirstapp.abeer.mysecretportfolio.plugins;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -7,12 +7,12 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.example.abeer.mysecretportfolio.AddNoteActivity;
-import com.example.abeer.mysecretportfolio.AddNoteDatabase;
-import com.example.abeer.mysecretportfolio.MainActivity;
-import com.example.abeer.mysecretportfolio.R;
-import com.example.abeer.mysecretportfolio.models.AddNoteModel;
-import com.example.abeer.mysecretportfolio.models.HomeModel;
+import com.engfirstapp.abeer.mysecretportfolio.AddNoteActivity;
+import com.engfirstapp.abeer.mysecretportfolio.AddNoteDatabase;
+import com.engfirstapp.abeer.mysecretportfolio.MainActivity;
+import com.engfirstapp.abeer.mysecretportfolio.R;
+import com.engfirstapp.abeer.mysecretportfolio.models.AddNoteModel;
+import com.engfirstapp.abeer.mysecretportfolio.models.HomeModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +23,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import static com.example.abeer.mysecretportfolio.MainActivity.ACTIVITY_SOURCE;
+import static com.engfirstapp.abeer.mysecretportfolio.MainActivity.ACTIVITY_SOURCE;
 
 public class PluginsGridActivity extends AppCompatActivity {
 

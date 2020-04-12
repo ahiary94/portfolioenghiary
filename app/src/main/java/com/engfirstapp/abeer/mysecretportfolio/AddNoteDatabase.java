@@ -1,4 +1,4 @@
-package com.example.abeer.mysecretportfolio;
+package com.engfirstapp.abeer.mysecretportfolio;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -10,8 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
-import com.example.abeer.mysecretportfolio.models.FavouriteModel;
-import com.example.abeer.mysecretportfolio.models.HomeModel;
+import com.engfirstapp.abeer.mysecretportfolio.models.HomeModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +20,7 @@ import androidx.annotation.Nullable;
 public class AddNoteDatabase extends SQLiteOpenHelper {
 
     private static final String NOTE_DB_NAME = "myNoteAppDB";
-    private static final int NOTE_DB_VERSION = 10;//last before push to store is 8
+    private static final int NOTE_DB_VERSION = 11;//last before push to store is 8
 
     // **********************************************************
     private String NOTES_TABLE = "notes_table";
@@ -115,11 +114,11 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("ALTER TABLE " + NOTES_TABLE + " ADD COLUMN " + NOTES_DELETE_FLAG + " INTEGER");
-        db.execSQL("UPDATE " + NOTES_TABLE + " SET " + NOTES_DELETE_FLAG + " = 0");
-
-        db.execSQL("ALTER TABLE " + PLUGINS_TABLE + " ADD COLUMN " + PLUGINS_DELETE_FLAG + " INTEGER");
-        db.execSQL("UPDATE " + PLUGINS_TABLE + " SET " + PLUGINS_DELETE_FLAG + " = 0");
+//        db.execSQL("ALTER TABLE " + NOTES_TABLE + " ADD COLUMN " + NOTES_DELETE_FLAG + " INTEGER");
+//        db.execSQL("UPDATE " + NOTES_TABLE + " SET " + NOTES_DELETE_FLAG + " = 0");
+//
+//        db.execSQL("ALTER TABLE " + PLUGINS_TABLE + " ADD COLUMN " + PLUGINS_DELETE_FLAG + " INTEGER");
+//        db.execSQL("UPDATE " + PLUGINS_TABLE + " SET " + PLUGINS_DELETE_FLAG + " = 0");
         //        db.execSQL("ALTER TABLE " + NOTES_TABLE + " ADD COLUMN " + NOTES_DATE + " TEXT");
 //        db.execSQL("UPDATE " + NOTES_TABLE + " SET " + NOTES_DATE + " = 4/7/2020");
 //        db.execSQL("ALTER TABLE " + PASSWORD_TABLE + " ADD COLUMN " + PASSWORD + " VARCHAR");
@@ -231,6 +230,10 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
         SQLiteDatabase database = this.getWritableDatabase();
         database.delete(NOTES_TABLE, "1", null);
         database.delete(PLUGINS_TABLE, "1", null);
+        database.delete(PASSWORD_TABLE, "1", null);
+        database.delete(QUOTE_TABLE, "1", null);
+        database.delete(SECRET_TABLE, "1", null);
+
 
     }
 
@@ -274,6 +277,12 @@ public class AddNoteDatabase extends SQLiteOpenHelper {
         SQLiteDatabase database = this.getWritableDatabase();
         database.delete(NOTES_TABLE, NOTES_ID + " = ?", new String[]{String.valueOf(id)});
         database.delete(PLUGINS_TABLE, PLUGINS_RID + " = ?", new String[]{String.valueOf(id)});
+
+    }
+
+    public void clearSecretTable() {
+        SQLiteDatabase database = this.getWritableDatabase();
+        database.delete(PASSWORD_TABLE, null, null);
 
     }
 

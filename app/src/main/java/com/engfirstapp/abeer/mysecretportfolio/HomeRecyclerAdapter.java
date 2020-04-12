@@ -1,4 +1,4 @@
-package com.example.abeer.mysecretportfolio;
+package com.engfirstapp.abeer.mysecretportfolio;
 
 import android.database.Cursor;
 import android.media.MediaPlayer;
@@ -15,7 +15,7 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.example.abeer.mysecretportfolio.models.HomeModel;
+import com.engfirstapp.abeer.mysecretportfolio.models.HomeModel;
 
 import java.io.IOException;
 import java.util.List;
