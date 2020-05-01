@@ -8,17 +8,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:476881689590:android:5525eb6836d441f11ac5d7",
+        "mobilesdk_app_id": "1:476881689590:android:32bee6104428a5bc1ac5d7",
         "android_client_info": {
-          "package_name": "com.example.abeer.mysecretportfolio"
+          "package_name": "com.engfirstapp.abeer.mysecretportfolio"
         }
       },
       "oauth_client": [
         {
-          "client_id": "476881689590-143p9ecg106f5vi4eakgvk8naf6ghqhv.apps.googleusercontent.com",
+          "client_id": "476881689590-k98v2g4mjl91pkcodvivui3q1hniranv.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.abeer.mysecretportfolio",
+            "package_name": "com.engfirstapp.abeer.mysecretportfolio",
             "certificate_hash": "20ed18a324bd90b8a64986aa0d5715bf98d1855a"
           }
         },
