@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#FD5A16</color>
-    <color name="colorPrimaryDark">#DD4D11</color>
-    <color name="colorAccent">#DD4D11</color>//ffbd90
+    <color name="colorPrimary">#FF611D</color>
+    <color name="colorPrimaryDark">#FF733A</color>
+    <color name="colorAccent">#FF733A</color>//ffbd90
 
     <!--    <color name="colorPrimary">#fde9cdae</color>-->
     <!--    <color name="colorPrimary">#9c5d67</color>-->
@@ -37,5 +37,6 @@
     <!--    <color name="gray_darkf">#27274B</color>-->
     <color name="dark_bluef">#13133D</color>
     <color name="alpha_grayf">#8D000000</color>
+<!--    <color name="alpha_grayf">#6765DD</color>-->
 
 </resources>

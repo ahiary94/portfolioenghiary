@@ -439,7 +439,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     void showSnackbar(String message, int drawable) {
 
-        snackbar = Snackbar.make(coordinator, Html.fromHtml("<font color=\"#5951EE\">" + message + "</font>"), Snackbar.LENGTH_SHORT);
+        snackbar = Snackbar.make(coordinator, Html.fromHtml("<font color=\"#6765DD\">" + message + "</font>"), Snackbar.LENGTH_SHORT);
         View snackbarLayout = snackbar.getView();
         TextView textView = snackbarLayout.findViewById(R.id.snackbar_text);
         textView.setCompoundDrawablesWithIntrinsicBounds(drawable, 0, 0, 0);
