@@ -219,7 +219,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onBackPressed() {
         saveNote();
-        super.onBackPressed();
+//        super.onBackPressed();
 
     }
 
@@ -250,20 +250,23 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
                 case 1:// edit from main
                 case 4:// new from main
                     Intent goToHome = new Intent(AddNoteActivity.this, MainActivity.class);
+                    goToHome.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(goToHome);
-                    finish();
+//                    finish();
                     break;
                 case 2:// favourite
                     Intent goToFav = new Intent(AddNoteActivity.this, PluginsGridActivity.class);
+                    goToFav.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     goToFav.putExtra("flag", 12); // favourite
                     startActivity(goToFav);
-                    finish();
+//                    finish();
                     break;
                 case 3: // secret
                     Intent goToSecret = new Intent(AddNoteActivity.this, PluginsGridActivity.class);
                     goToSecret.putExtra("flag", 11); // secret
+                    goToSecret.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(goToSecret);
-                    finish();
+//                    finish();
                     break;
             }
 
