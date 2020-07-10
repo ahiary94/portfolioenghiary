@@ -17,7 +17,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".TrashCanActivity"></activity>
+        <activity android:name=".jetpackportfolio.AddNoteJP"></activity>
+        <activity android:name=".TrashCanActivity" />
 
         <meta-data
             android:name="com.google.android.gms.ads.AD_MANAGER_APP"
@@ -36,7 +37,7 @@
         <activity
             android:name=".TestingActivity"
             android:label="Testing"
-            android:screenOrientation="sensorPortrait"></activity>
+            android:screenOrientation="sensorPortrait" />
         <activity
             android:name=".plugins.CalenderActivity"
             android:label="@string/calender"

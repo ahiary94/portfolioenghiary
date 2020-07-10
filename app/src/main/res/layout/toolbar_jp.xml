@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <data>
+        <variable
+            name="apptoolbar"
+            type="int" />
+    </data>
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/add_note_toolbar_jp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:ignore="NewApi">
+
+            <EditText
+                android:id="@+id/add_note_toolbar_editText_jp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_title"
+                android:textColorHint="@color/white"
+                android:textColor="@color/white"
+                android:maxLength="22"
+                android:fontFamily="casual"
+                android:padding="5dp"/>
+
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+</layout>
